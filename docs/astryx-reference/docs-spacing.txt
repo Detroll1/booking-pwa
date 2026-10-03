@@ -1,0 +1,64 @@
+﻿# Spacing
+
+Spacing scale tokens for padding, gap, and margin: the rhythmic foundation of design system layouts.
+
+## Overview
+
+The design system uses a 4px base-unit spacing scale. Component gap props accept step values that map to these tokens. The scale provides fine-grained control at the small end (2px, 4px, 6px) and consistent rhythm at larger sizes (multiples of 4px).
+
+## Scale
+
+Fifteen spacing tokens, from 0px to 48px.
+
+Spacing scale used for padding, gap, and margin. Component gap props map spacing steps to these tokens.
+
+Token         | Value
+------------- | -----
+--spacing-0   | 0px  
+--spacing-0-5 | 2px  
+--spacing-1   | 4px  
+--spacing-1-5 | 6px  
+--spacing-2   | 8px  
+--spacing-3   | 12px 
+--spacing-4   | 16px 
+--spacing-5   | 20px 
+--spacing-6   | 24px 
+--spacing-7   | 28px 
+--spacing-8   | 32px 
+--spacing-9   | 36px 
+--spacing-10  | 40px 
+--spacing-11  | 44px 
+--spacing-12  | 48px 
+
+## Usage
+
+Stack, HStack, VStack, Grid, Toolbar, OverflowList, and ChatMessageList take a `gap` step: 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, or 10 (├Ч4px). Carousel takes the steps from 0 to 4. For custom layouts, use the spacing tokens in StyleX.
+
+Spacing via component props vs StyleX:
+```tsx
+// Via component props (preferred)
+<Stack gap={4}>{/* 16px gap */}</Stack>
+
+// Via StyleX tokens (custom layouts)
+import {spacingVars} from '@astryxdesign/core/theme/tokens.stylex';
+
+const styles = stylex.create({
+  custom: {
+    padding: spacingVars['--spacing-4'],
+    gap: spacingVars['--spacing-3'],
+  },
+});
+```
+
+## Best Practices
+
++ Use component gap props when available; they handle automatic spacing compensation.
++ Stick to the scale for consistency. If a value isn't on the scale, reconsider the design.
++ Use smaller steps (0.5тАУ2) for tight internal spacing and larger steps (4тАУ8) for section gaps.
+
+x Use arbitrary pixel values outside the scale.
+x Mix spacing tokens with raw px/rem values in the same component.
+
+Up: npx @astryxdesign/cli docs unorganized
+Previous: npx @astryxdesign/cli docs shape
+Next: npx @astryxdesign/cli docs styling-libraries

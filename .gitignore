@@ -1,0 +1,14 @@
+.env
+.env.local
+dist
+node_modules
+coverage
+test-results
+playwright-report
+supabase/.temp
+supabase/functions/.deno
+*.local
+*.log
+.screenshots
+artifacts
+*.tsbuildinfo

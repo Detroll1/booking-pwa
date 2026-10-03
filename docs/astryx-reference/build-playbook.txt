@@ -1,0 +1,53 @@
+﻿
+> booking-pwa@0.1.0 astryx
+> node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs build dark mobile booking PWA for an auto detailing studio: home page with hero photo, services list with prices, booking flow with date and time, my booking page, owner cabinet
+
+Build kit for "dark mobile booking PWA for an auto detailing studio: home page with hero photo, services list with prices, booking flow with date and time, my booking page, owner cabinet"
+
+Start from the TEMPLATE, fill it with BLOCKS, and use COMPONENTS only for what is left.
+Changing a page you already have? Keep it, and use only the blocks and components.
+
+TEMPLATE
+No template matched, so start from the app shell. Scaffold it, then put blocks inside it.
+
+name:        shell-top-nav
+description: Application frame with horizontal navigation only: a centered bar whose items open full-width mega-menu panels, over placeholder content that keeps the entire width.
+command:     npx astryx template shell-top-nav --type page <path>
+
+OTHER TEMPLATES
+If the layout is wrong, scaffold one of these instead. All page templates: npx astryx template --list --type page
+
+name:        gallery-hero
+description: Centered stack (headline, short blurb, call-to-action buttons) resolving into a multi-image photo grid rather than one wide full-bleed picture, so the imagery reads as a set.
+command:     npx astryx template gallery-hero --type page <path>
+
+name:        product-detail
+description: Single-item detail pairing a media gallery with a selection column: variant swatches, a quantity stepper, primary and secondary commit actions, and collapsible specification sections below.
+command:     npx astryx template product-detail --type page <path>
+
+BLOCKS
+Ready-made sections for parts the template lacks (top 3 of 5; --verbose for all). Print one: npx astryx template <name>
+
+name:        BannerCollapsibleContent
+description: Combine an action button, dismiss control, and a collapsible detail area in one banner.
+
+name:        LayoutDualPanelLayout
+description: A file browser style layout with start panel for folders, main content for files, and end panel for details.
+
+name:        ListItemWithMetadata
+description: List items with end-aligned metadata.
+
+COMPONENTS
+For what the template and blocks do not cover (top 3 of 6; --verbose for all). Read one: npx astryx component <name>
+
+name:        BottomSheet
+description: A mobile touch surface for filters, actions, forms, and detail views that should rise from the bottom of the viewport; use BottomSheetSwitcher for multi-step flows.
+
+name:        Timestamp
+description: Timestamp formats a date or time value into human-readable text.
+
+name:        Avatar
+description: Avatar represents a person or team with a profile photo, initials, or a default icon.
+
+frame:      AppShell, TopNav, SideNav, Layout
+foundation: VStack, HStack, Grid, StackItem, Card, Section, Text, Heading, Button, Icon, Badge, Divider

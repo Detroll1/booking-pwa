@@ -1,0 +1,311 @@
+﻿# Styling Library Interop
+
+Integrate Tailwind, StyleX, Panda, Chakra, MUI, CSS-in-JS, CSS Modules, and non-CSS renderers with system tokens.
+
+## Core Principle
+
+Keep the system as the source of truth for theme values. Components read design tokens from CSS custom properties such as `--color-text-primary`, `--color-background-surface`, `--spacing-4`, and `--radius-container`. Other styling libraries should map their own semantic tokens, utility names, or theme objects to those system CSS variables whenever possible.
+
+Use CSS variables for ordinary DOM styling because they inherit through the tree, follow `data-theme` color mode, respect nested `data-astryx-theme` scopes, and update when themes switch. Use token resolver APIs only for non-CSS consumers such as SVG attribute values, canvas, chart configuration, color calculations, or static config generation.
+
+For available token names and values, run `astryx docs tokens`. Focused references are also available with `astryx docs color`, `astryx docs spacing`, `astryx docs shape`, `astryx docs typography`, `astryx docs elevation`, and `astryx docs motion`.
+
+## Choose an Integration Path
+
+Choose the narrowest integration path that fits the styling library. Most DOM styling should stay on the CSS-variable path; JavaScript token resolution is for APIs that cannot consume CSS custom properties.
+
+Path                       | Use when                                                                 | Value shape                                                        
+-------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------
+CSS variable aliases       | The library ultimately writes CSS and accepts string values              | `var(--color-text-primary)`                                        
+StyleX token imports       | You are writing StyleX styles in application code                        | `colorVars['--color-text-primary']`                                
+Tailwind bridge            | You want utility classes backed by active system tokens                  | `@astryxdesign/core/tailwind-theme.css`                            
+Design token resolver APIs | JavaScript needs token values for charts, canvas, SVG, or config objects | `resolveThemeToken(theme, '--color-data-categorical-blue', {mode})`
+
+## Best Practices
+
++ Map by semantic intent: text, surface, border, accent, status, radius, spacing, typography.
++ Let the system own color mode. The root Theme syncs `data-theme="light|dark"` and `data-astryx-theme` to `<html>` for portals and first-level theme scope.
++ Prefer CSS variables for runtime theme switching and nested themes.
+
+x Copy raw hex/px values into a second theme object when a `var(...)` reference would work.
+x Run a second unsynchronized dark-mode provider that disagrees with Theme.
+x Make another library's CSS variables the source of truth for the system. Some consumers need token values outside the DOM.
+
+## Plain CSS and CSS Modules
+
+The simplest integration is direct CSS variable usage. CSS Modules scope class names, but system token variables are global/inherited values supplied by package CSS and the active theme.
+
+Card.module.css:
+```css
+.card {
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-container);
+  padding: var(--spacing-4);
+}
+```
+
+Sass variables are compile-time only. They are useful for generating static CSS, but they do not update when the system switches theme or color mode. Use native CSS custom properties for themeable values.
+
+## StyleX
+
+For StyleX styles, prefer the typed token exports from `@astryxdesign/core/theme/tokens.stylex`. They provide autocomplete and catch token-name typos while still resolving through the same system CSS variables at runtime.
+
+Typed token imports:
+```tsx
+import * as stylex from '@stylexjs/stylex';
+import {colorVars, spacingVars, radiusVars} from '@astryxdesign/core/theme/tokens.stylex';
+
+const styles = stylex.create({
+  panel: {
+    backgroundColor: colorVars['--color-background-surface'],
+    color: colorVars['--color-text-primary'],
+    padding: spacingVars['--spacing-4'],
+    borderRadius: radiusVars['--radius-container'],
+  },
+});
+```
+
+Use `xstyle` for component overrides and `stylex.props()` for your own DOM nodes. Use `className` when integrating a non-StyleX styling library.
+
+## Tailwind
+
+The Tailwind v4 bridge at `@astryxdesign/core/tailwind-theme.css` maps Tailwind theme variables to system CSS variables with `@theme reference inline`, so utility classes like `text-primary`, `bg-surface`, `border-border`, `rounded-lg`, and `shadow-md` stay in sync with the active theme without emitting competing runtime declarations.
+
+globals.css:
+```css
+@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "@astryxdesign/core/reset.css";
+@import "@astryxdesign/core/astryx.css";
+@import "@astryxdesign/theme-neutral/theme.css";
+@import "@astryxdesign/core/tailwind-theme.css";
+@import "tailwindcss/utilities.css" layer(utilities);
+```
+
+Pre-declare every layer before any imports. This keeps reset lowest, Tailwind preflight above reset, component/theme styles in the middle, and Tailwind utilities last so utility classes on `className` can intentionally override component defaults.
+
+Tailwind classes backed by system tokens:
+```tsx
+<section className="rounded-lg border border-border bg-surface p-4 text-primary shadow-md">
+  <Button label="Save" variant="primary" />
+</section>
+```
+
+The Tailwind bridge is the concrete example of the general interop pattern: expose another library's semantic API, but point the values at system token variables.
+
+## Panda, Chakra, and Other Semantic Token Systems
+
+Libraries like Panda CSS and Chakra UI have first-class semantic token objects. Put system CSS variables at the leaves of those objects so product code can use the library's semantic names while the system still owns the values.
+
+Semantic token aliases:
+```ts
+semanticTokens: {
+  colors: {
+    text: {
+      primary: {value: 'var(--color-text-primary)'},
+      secondary: {value: 'var(--color-text-secondary)'},
+    },
+    background: {
+      surface: {value: 'var(--color-background-surface)'},
+      body: {value: 'var(--color-background-body)'},
+    },
+    border: {
+      default: {value: 'var(--color-border)'},
+    },
+  },
+},
+tokens: {
+  spacing: {
+    4: {value: 'var(--spacing-4)'},
+  },
+  radii: {
+    container: {value: 'var(--radius-container)'},
+  },
+}
+```
+
+Panda-style usage:
+```tsx
+<section
+  className={css({
+    bg: 'background.surface',
+    color: 'text.primary',
+    borderColor: 'border.default',
+    p: '4',
+    rounded: 'container',
+  })}
+/>
+```
+
+If a semantic-token library needs to generate its own light/dark CSS from raw values, align its mode selector with Theme (`data-theme="light|dark"`) and generate that adapter from system theme data. Otherwise it can drift from nested or runtime themes.
+
+## MUI and Palette-Based Themes
+
+`MUI` expects palette slots such as primary, background, text, and divider. Map those slots to system variables for ordinary component styling. Use raw values only when MUI or your code needs to parse colors for contrast, alpha, lighten, or darken calculations.
+
+MUI palette mapped to system vars:
+```ts
+const theme = createTheme({
+  cssVariables: true,
+  colorSchemes: {
+    light: {
+      palette: {
+        primary: {main: 'var(--color-accent)'},
+        background: {
+          default: 'var(--color-background-body)',
+          paper: 'var(--color-background-surface)',
+        },
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+        },
+        divider: 'var(--color-border)',
+      },
+    },
+    dark: {
+      palette: {
+        primary: {main: 'var(--color-accent)'},
+        background: {
+          default: 'var(--color-background-body)',
+          paper: 'var(--color-background-surface)',
+        },
+        text: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+        },
+        divider: 'var(--color-border)',
+      },
+    },
+  },
+});
+```
+
+If MUI owns color mode in an app, generate the light and dark palette values from system theme data and keep Theme mode synchronized. If Theme owns color mode, keep both MUI schemes pointing at the same system CSS variables.
+
+## Emotion, styled-components, Theme UI, and Styled System
+
+Runtime CSS-in-JS libraries such as `Emotion` and `styled-components` usually accept arbitrary theme objects. Keep those objects semantic, but store system CSS variable references as the values. This keeps generated classes stable while the system updates values through the CSS cascade.
+
+Generic CSS-in-JS theme object:
+```ts
+const appTheme = {
+  colors: {
+    textPrimary: 'var(--color-text-primary)',
+    textSecondary: 'var(--color-text-secondary)',
+    surface: 'var(--color-background-surface)',
+    border: 'var(--color-border)',
+    accent: 'var(--color-accent)',
+  },
+  spacing: {
+    4: 'var(--spacing-4)',
+  },
+  radius: {
+    container: 'var(--radius-container)',
+  },
+};
+```
+
+Avoid rebuilding CSS-in-JS theme objects with raw color values on every mode switch. CSS variables let the class names stay the same while the browser resolves the active values.
+
+## UnoCSS and Custom Utility Systems
+
+Utility generators such as UnoCSS can put system variables in their theme config or shortcuts. Keep classes semantic (`bg-surface`, `text-primary`) and let the values point at system tokens.
+
+UnoCSS-style config:
+```ts
+export default defineConfig({
+  theme: {
+    colors: {
+      surface: 'var(--color-background-surface)',
+      primary: 'var(--color-text-primary)',
+      border: 'var(--color-border)',
+      accent: 'var(--color-accent)',
+    },
+    spacing: {
+      4: 'var(--spacing-4)',
+    },
+  },
+  shortcuts: {
+    'astryx-card': 'bg-surface text-primary border border-border rounded-lg p-4',
+  },
+});
+```
+
+Static utility extractors cannot see dynamically constructed class names. Prefer explicit class strings or the library's safelist/source-registration mechanism.
+
+## Non-CSS Processing
+
+Use `resolveThemeTokens()` or `resolveThemeToken()` when code outside React needs token values for a known theme and mode. Use `useTheme()` inside client components when the values should come from the nearest Theme and active mode.
+
+Resolve tokens without React context:
+```ts
+import {resolveThemeTokens} from '@astryxdesign/core/theme/tokens';
+import {neutralTheme} from '@astryxdesign/theme-neutral';
+
+const tokens = resolveThemeTokens(neutralTheme, {mode: 'light'});
+
+const chartOptions = {
+  textColor: tokens['--color-text-primary'],
+  mutedTextColor: tokens['--color-text-secondary'],
+  gridColor: tokens['--color-border'],
+  seriesColors: [
+    tokens['--color-data-categorical-blue'],
+    tokens['--color-data-categorical-orange'],
+    tokens['--color-data-categorical-purple'],
+  ],
+};
+```
+
+Resolve tokens from the nearest Theme:
+```tsx
+'use client';
+
+import {useMemo} from 'react';
+import {useTheme} from '@astryxdesign/core/theme';
+
+function RevenueChart({data}: {data: Array<{x: string; y: number}>}) {
+  const {mode, tokens} = useTheme();
+
+  const chartOptions = useMemo(
+    () => ({
+      mode,
+      textColor: tokens['--color-text-primary'],
+      mutedTextColor: tokens['--color-text-secondary'],
+      gridColor: tokens['--color-border'],
+      seriesColors: [
+        tokens['--color-data-categorical-blue'],
+        tokens['--color-data-categorical-orange'],
+        tokens['--color-data-categorical-purple'],
+      ],
+    }),
+    [mode, tokens],
+  );
+
+  return <ThirdPartyChart data={data} options={chartOptions} />;
+}
+```
+
+## Non-CSS Processing Best Practices
+
++ Use the returned `tokens` object as a memo dependency; it is stable until the active theme or mode changes.
++ Use data visualization tokens such as `--color-data-categorical-blue` for chart series instead of reusing arbitrary UI colors.
++ Prefer CSS variables for SVG elements when possible (`fill="var(--color-accent)"`); use token resolver APIs when an API requires a string value in JavaScript.
+
+x Use token resolver APIs for ordinary DOM styling. Use CSS variables, StyleX tokens, xstyle, or library aliases instead.
+x Assume the returned values reflect every CSS cascade override. They resolve tokens for the current theme and mode; local media-surface overrides and arbitrary CSS overrides may not be represented in the returned map.
+
+## Interop Checklist
+
+1. Import the reset/base CSS and a theme CSS file early enough for first paint. For production SSR, prefer built themes from `astryx theme build` or published `/built` theme imports plus `theme.css`.
+2. Choose one owner for color mode. Theme uses `data-theme="light|dark"` and `color-scheme` to resolve `light-dark()` tokens.
+3. Map the external library's semantic layer to system variables by intent, not by exact naming. For example, MUI `background.paper` maps to `--color-background-surface`.
+4. Use `astryx docs tokens` and focused token docs when building mappings. Keep mappings small at first: text, surface/body/card/popover, border, accent, status, spacing, radius, typography, shadow.
+5. Use token resolver APIs only for non-CSS APIs that need resolved values.
+
+Up: npx @astryxdesign/cli docs unorganized
+Previous: npx @astryxdesign/cli docs spacing
+Next: npx @astryxdesign/cli docs styling

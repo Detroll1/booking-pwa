@@ -1,0 +1,106 @@
+@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "@astryxdesign/core/reset.css";
+@import "@astryxdesign/core/astryx.css";
+@import "../themes/app/app.css";
+@import "@astryxdesign/core/tailwind-theme.css";
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/*
+ * Tenant runtime accent. The Astryx app theme already points --color-accent at
+ * var(--tenant-accent); this declaration is only the default value and is
+ * overwritten at runtime by src/lib/tenant/theme.ts from business.json.
+ * Do NOT re-declare --color-* here (astryx AGENTS rule).
+ */
+:root {
+  --tenant-accent: #4690ff;
+  --tenant-accent-soft: color-mix(in oklab, var(--tenant-accent) 18%, transparent);
+  --tenant-surface-image: none;
+}
+
+/* shadcn/base-nova compatibility variables, mapped onto Astryx tokens. */
+@theme inline {
+  --color-background: var(--color-background-body);
+  --color-foreground: var(--color-text-primary);
+  --color-card: var(--color-background-surface);
+  --color-card-foreground: var(--color-text-primary);
+  --color-popover: var(--color-background-surface);
+  --color-popover-foreground: var(--color-text-primary);
+  --color-primary: var(--tenant-accent);
+  --color-primary-foreground: var(--color-on-accent, #ffffff);
+  --color-secondary: var(--color-background-muted);
+  --color-secondary-foreground: var(--color-text-primary);
+  --color-muted: var(--color-background-muted);
+  --color-muted-foreground: var(--color-text-secondary);
+  --color-accent: var(--tenant-accent);
+  --color-accent-foreground: var(--color-on-accent, #ffffff);
+  --color-destructive: var(--color-status-danger);
+  --color-border: var(--color-border);
+  --color-input: var(--color-border);
+  --color-ring: var(--tenant-accent);
+}
+
+/* Safe-area helpers for the bottom navigation and sheets. */
+@layer utilities {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pb-nav {
+    padding-bottom: calc(var(--bottom-nav-height, 68px) + env(safe-area-inset-bottom, 0px));
+  }
+  .glass {
+    /* Fallback background first, then the frosted mixture where supported. */
+    background: var(--color-background-body);
+    background: color-mix(in oklab, var(--color-background-body) 62%, transparent);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border-color: color-mix(in oklab, var(--color-border) 60%, transparent);
+  }
+  .text-tenant-accent {
+    color: var(--tenant-accent);
+  }
+  .bg-tenant-accent {
+    background-color: var(--tenant-accent);
+  }
+  .border-tenant-accent {
+    border-color: var(--tenant-accent);
+  }
+  .tenant-accent-soft {
+    background-color: var(--tenant-accent-soft);
+  }
+  .hero {
+    position: relative;
+    background-image: var(--tenant-surface-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .hero-grad::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--color-background-body) 96%, transparent) 0%,
+      color-mix(in oklab, var(--color-background-body) 45%, transparent) 42%,
+      transparent 100%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
