@@ -1,5 +1,5 @@
 import {NavLink, useParams} from 'react-router-dom';
-import {House, GridFour, Ticket} from '@phosphor-icons/react';
+import {House, Robot, Ticket} from '@phosphor-icons/react';
 import {HStack} from '@astryxdesign/core/HStack';
 import {Text} from '@astryxdesign/core/Text';
 import {tenantPath} from '@/lib/tenant/resolve';
@@ -7,7 +7,7 @@ import {cn} from '@/lib/utils';
 
 const ITEMS = [
   {to: '', label: 'Главная', icon: House, end: true},
-  {to: 'services', label: 'Услуги', icon: GridFour, end: false},
+  {to: 'ai', label: 'Запись с ИИ', icon: Robot, end: false},
   {to: 'booking', label: 'Моя запись', icon: Ticket, end: false},
 ] as const;
 
