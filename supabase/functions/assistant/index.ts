@@ -13,6 +13,15 @@ import {
   type FallbackData,
   type Intent,
 } from '../_shared/assistant-router.ts';
+import {parseRequest, filterSlots} from '../../../src/lib/assistant/nlparse.ts';
+
+/** Adapt the browser-focused filterSlots to the server slot shape. */
+function filterByRequest(
+  parsed: ReturnType<typeof parseRequest>,
+  slots: {iso: string; label: string; dayLabel: string; hour: number}[],
+): {iso: string; label: string; dayLabel: string; hour: number}[] {
+  return filterSlots(parsed, slots);
+}
 
 // Free assistant: no paid LLM. It routes the question to a server-side tool and
 // answers ONLY from real database data. Nothing is invented.
@@ -47,14 +56,27 @@ async function runTool(name: string, ctx: ToolContext, args: Record<string, unkn
       };
     }
     case 'get_availability': {
-      const {data: service} = await ctx.client
+      // Prefer the service matching the user's wording (e.g. "мойка").
+      const keyword = (args.keyword as string | null) ?? null;
+      let query = ctx.client
         .from('services')
-        .select('id')
+        .select('id,name')
         .eq('tenant_id', ctx.tenantId)
         .eq('is_active', true)
-        .order('sort')
-        .limit(1)
-        .maybeSingle();
+        .order('sort');
+      if (keyword) query = query.ilike('name', `%${keyword}%`);
+      let {data: service} = await query.limit(1).maybeSingle();
+      if (!service && keyword) {
+        const fallback = await ctx.client
+          .from('services')
+          .select('id,name')
+          .eq('tenant_id', ctx.tenantId)
+          .eq('is_active', true)
+          .order('sort')
+          .limit(1)
+          .maybeSingle();
+        service = fallback.data;
+      }
       if (!service) return {slots: []};
       const from = new Date().toISOString().slice(0, 10);
       const availability = await rpc<{days: {date: string; slots: string[]}[]}>(
@@ -62,14 +84,19 @@ async function runTool(name: string, ctx: ToolContext, args: Record<string, unkn
         'rpc_get_availability',
         {p_tenant_id: ctx.tenantId, p_service_id: service.id, p_from: from, p_days: 7},
       );
-      const slots: string[] = [];
-      for (const day of availability.days ?? []) {
-        for (const slot of day.slots.slice(0, 3)) {
-          slots.push(new Date(slot).toLocaleString(ctx.locale, {timeZone: ctx.timezone, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}));
-        }
-        if (slots.length >= 6) break;
-      }
-      return {slots};
+      const todayKey = new Date().toISOString().slice(0, 10);
+      const structured = (availability.days ?? []).flatMap((day) =>
+        day.slots.slice(0, 6).map((iso) => {
+          const label = new Date(iso).toLocaleString(ctx.locale, {timeZone: ctx.timezone, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+          const hour = Number(new Date(iso).toLocaleString('en-GB', {timeZone: ctx.timezone, hour: '2-digit', hour12: false}));
+          const prefix = day.date === todayKey ? 'сегодня ' : day.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? 'завтра ' : '';
+          return {iso, label: prefix + label, dayLabel: prefix + label, hour};
+        }),
+      );
+      const parsed = parseRequest(String(args.message ?? ''));
+      const filtered = filterByRequest(parsed, structured);
+      const chosen = (filtered.length ? filtered : structured).slice(0, 5);
+      return {slots: chosen.map((s) => s.label), serviceName: service.name};
     }
     case 'get_tenant_info': {
       const {data: tenant} = await ctx.client.from('tenants').select('address,phone').eq('id', ctx.tenantId).single();
@@ -149,14 +176,14 @@ Deno.serve((request) =>
       timezone: tenantRow?.timezone ?? 'UTC',
     };
 
-    const rawIntent = detectIntent(message);
+    const parsed = parseRequest(message);
     // A client asking an owner question never reaches owner tools.
-    const intent: Intent = scope === 'client' && isOwnerIntent(rawIntent) ? 'services' : rawIntent;
+    const intent: Intent = scope === 'client' && isOwnerIntent(parsed.intent) ? 'services' : parsed.intent;
     const tool = toolForIntent(intent, scope);
     const usedTools: string[] = [];
     let data: FallbackData = {};
     if (allowedTools(scope).includes(tool)) {
-      data = await runTool(tool, ctx, {});
+      data = await runTool(tool, ctx, {keyword: parsed.serviceKeyword, message});
       usedTools.push(tool);
     }
 

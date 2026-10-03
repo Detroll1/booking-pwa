@@ -10,6 +10,7 @@ import {Card} from '@astryxdesign/core/Card';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Badge} from '@astryxdesign/core/Badge';
 import {AsyncBoundary} from '@/components/AsyncBoundary';
+import {TenantHeader} from '@/components/layout/TenantHeader';
 import {useTenantContext} from '@/app/TenantContext';
 import {useBookingByToken, useCancelBooking, useSubscribeReminder} from '@/hooks/useBooking';
 import {formatZoned} from '@/lib/time/tz';
@@ -88,7 +89,9 @@ export function MyBookingPage() {
 
   if (!token) {
     return (
-      <VStack gap={3} padding={4} paddingBlockEnd={8}>
+      <>
+        <TenantHeader />
+        <VStack gap={3} padding={4} paddingBlockEnd={8}>
         <Heading level={1}>Моя запись</Heading>
         <AsyncBoundary
           isEmpty
@@ -96,12 +99,15 @@ export function MyBookingPage() {
           emptyHint="Откройте ссылку из подтверждения записи или запишитесь заново."
         />
         <Button label="Записаться" variant="primary" width="100%" href={`/s/${slug}/book`} />
-      </VStack>
+        </VStack>
+      </>
     );
   }
 
   return (
-    <VStack gap={4} padding={4} paddingBlockEnd={8}>
+    <>
+      <TenantHeader />
+      <VStack gap={4} padding={4} paddingBlockEnd={8}>
       <Heading level={1}>Моя запись</Heading>
       <AsyncBoundary isLoading={query.isLoading} error={query.error} onRetry={() => void query.refetch()}>
         {booking ? <BookingDetails booking={booking} locale={tenant.locale} /> : null}
@@ -179,7 +185,8 @@ export function MyBookingPage() {
           ) : null}
         </VStack>
       ) : null}
-    </VStack>
+      </VStack>
+    </>
   );
 }
 

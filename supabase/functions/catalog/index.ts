@@ -51,11 +51,12 @@ Deno.serve((request) =>
     if (error) throw new ApiError('db_error', error.message, 500);
     if (!tenant) throw new ApiError('tenant_not_found', 'Студия не найдена', 404);
 
-    const [services, media, cards, hours] = await Promise.all([
+    const [services, media, cards, hours, resources] = await Promise.all([
       client.from('services').select('*').eq('tenant_id', tenant.id).eq('is_active', true).order('sort'),
       client.from('media').select('*').eq('tenant_id', tenant.id).eq('kind', 'work').order('sort'),
       client.from('info_cards').select('*').eq('tenant_id', tenant.id).order('sort'),
       client.from('working_hours').select('*').eq('tenant_id', tenant.id).order('weekday'),
+      client.from('resources').select('id').eq('tenant_id', tenant.id).eq('is_active', true),
     ]);
 
     return json({
@@ -79,6 +80,12 @@ Deno.serve((request) =>
         cancelWindowMinutes: tenant.cancel_window_minutes,
         slotStepMinutes: tenant.slot_step_minutes,
         hoursSummary: hoursSummary((hours.data ?? []) as HourRow[]),
+        serviceCount: (services.data ?? []).length,
+        resourceCount: (resources.data ?? []).length,
+        minPriceMinor: (services.data ?? []).reduce(
+          (min: number, s: {price_minor: number}) => Math.min(min, s.price_minor),
+          Number.POSITIVE_INFINITY,
+        ),
         infoCards: (cards.data ?? []).map((c) => ({id: c.id, title: c.title, body: c.body, icon: c.icon})),
       },
       services: (services.data ?? []).map((s) => ({

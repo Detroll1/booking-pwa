@@ -45,6 +45,7 @@ export function allowedTools(scope: AssistantScope): string[] {
 }
 
 export interface FallbackData {
+  serviceName?: string;
   services?: {name: string; priceLabel: string; durationMinutes: number}[];
   slots?: string[];
   address?: string | null;
@@ -67,7 +68,8 @@ export function fallbackReply(intent: Intent, data: FallbackData): string {
     }
     case 'availability': {
       if (!data.slots?.length) return 'На ближайшие дни свободных окон не нашлось. Попробуйте выбрать другую дату.';
-      return `Ближайшие свободные окна: ${data.slots.slice(0, 5).join(', ')}. Записаться можно на главной странице.`;
+      const who = data.serviceName ? ` на «${data.serviceName}»` : '';
+      return `Свободные окна${who}: ${data.slots.slice(0, 5).join(', ')}. Откройте «Записаться», чтобы подтвердить.`;
     }
     case 'location': {
       if (!data.address) return 'Адрес пока не указан в настройках студии.';

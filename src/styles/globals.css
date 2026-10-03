@@ -51,7 +51,7 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .pb-nav {
-    padding-bottom: calc(var(--bottom-nav-height, 68px) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--bottom-nav-height, 76px) + env(safe-area-inset-bottom, 0px));
   }
   .glass {
     /* Fallback background first, then the frosted mixture where supported. */

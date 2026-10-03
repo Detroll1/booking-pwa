@@ -20,7 +20,7 @@ export function BottomNav() {
   const {slug = ''} = useParams();
   return (
     <nav aria-label="Основная навигация" className="glass fixed inset-x-0 bottom-0 z-40 border-t pb-safe">
-      <HStack gap={0} hAlign="evenly" paddingInline={2} height={68}>
+      <HStack gap={0} hAlign="evenly" paddingInline={2} minHeight={72} paddingBlockStart={2}>
         {ITEMS.map((item) => {
           const Icon = item.icon;
           return (

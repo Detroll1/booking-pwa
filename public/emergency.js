@@ -1,20 +1,25 @@
 /*
- * Emergency Supabase-compatible gate.
- * If EntryGuard sees a database response that is NOT JSON (Supabase down or a
- * stale project), it reloads the app with ?fallback=1. This script runs before
- * the app modules and, in that mode, replaces window.fetch with a local mock of
- * the Edge Functions so the demo still works. It uses the same JSON shape as the
- * real API, so no application code changes.
+ * Emergency Supabase-compatible gate for the static demo.
+ * Runs before the app modules. When the page is opened with ?fallback=1 (or the
+ * configured database does not answer), it replaces window.fetch with a local
+ * mock of the Edge Functions, using the same JSON shape as the real API, so the
+ * whole site is explorable without a backend.
  */
 (function () {
   var LOCK = '{"error":{"code":"db_unavailable"}}';
   try {
-    Object.defineProperty(navigator, 'locks', {value: {request: function () { return Promise.resolve(); }}, configurable: true});
+    Object.defineProperty(navigator, 'locks', {
+      value: {request: function () { return Promise.resolve(); }},
+      configurable: true,
+    });
   } catch (e) {}
-  var params = new URLSearchParams(location.search);
-  if (params.get('fallback') !== '1') return;
 
-  var slot = function (h, m) { var d = new Date(); d.setUTCDate(d.getUTCDate() + 1); d.setUTCHours(h - 3, m, 0, 0); return d.toISOString(); };
+  var slot = function (h, m) {
+    var d = new Date();
+    d.setUTCDate(d.getUTCDate() + 1);
+    d.setUTCHours(h - 3, m, 0, 0);
+    return d.toISOString();
+  };
   var BOOKING = {
     id: 'demo-booking', tenantSlug: 'graphite-detailing', status: 'confirmed', serviceName: 'Комплексная мойка',
     customerName: 'Демо клиент', customerPhone: '+7 900 000-00-00', car: 'BMW X5', comment: null,
@@ -29,6 +34,7 @@
     phone: '+7 495 000-10-10', address: 'Москва, ул. Автозаводская, 18, бокс 4', mapUrl: null,
     heroImageUrl: null, logoUrl: null, social: {}, bookingLeadMinutes: 60, cancelWindowMinutes: 180,
     slotStepMinutes: 30, hoursSummary: ['Пн–Сб: 09:00–21:00'],
+    serviceCount: 4, resourceCount: 3, minPriceMinor: 350000,
     infoCards: [
       {id: 'c1', title: 'Бокс закреплён за вами', body: 'Машина занимает бокс на всё время услуги.', icon: 'shield'},
       {id: 'c2', title: 'Честные сроки', body: 'Керамика — от двух дней.', icon: 'clock'},
@@ -45,22 +51,41 @@
   var AVAIL = {timezone: 'Europe/Moscow', serviceId: 's1', durationMinutes: 90, days: [{date: DAY, isClosed: false, slots: [slot(10, 0), slot(11, 30), slot(13, 0), slot(15, 0)]}]};
   var CATALOG = {tenant: TENANT, services: SERVICES, works: [], serverTime: new Date().toISOString()};
 
-  window.__DEMO = true;
-  var real = window.fetch.bind(window);
-  function reply(obj) { return Promise.resolve(new Response(JSON.stringify(obj), {status: 200, headers: {'Content-Type': 'application/json'}})); }
-  window.fetch = function (input, init) {
-    var url = typeof input === 'string' ? input : input.url;
-    try {
-      if (url.indexOf('/functions/v1/catalog') !== -1) return reply(CATALOG);
-      if (url.indexOf('/functions/v1/availability') !== -1) return reply(AVAIL);
-      if (url.indexOf('/functions/v1/bookings') !== -1) {
-        var b = init && init.body ? JSON.parse(init.body) : {};
-        if (b.action === 'create') return reply({booking: BOOKING, accessToken: 'demo-access-token', replayed: false});
-        return reply({booking: BOOKING});
-      }
-      if (url.indexOf('/functions/v1/assistant') !== -1) return reply({reply: 'Это демонстрационный режим. В рабочей версии помощник берёт данные из базы студии.', intent: 'unknown', usedTools: [], suggestions: ['Когда ближайшее окно?', 'Сколько стоит полировка?']});
-      if (url.indexOf('/functions/v1/owner') !== -1 || url.indexOf('/auth/v1') !== -1) return reply(LOCK && {error: {code: 'demo'}});
-    } catch (e) {}
-    return real(input, init);
-  };
+  function reply(obj) {
+    return Promise.resolve(new Response(JSON.stringify(obj), {status: 200, headers: {'Content-Type': 'application/json'}}));
+  }
+
+  function activate() {
+    window.__FORCE_FALLBACK = true;
+    window.__DEMO = true;
+    var real = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+      var url = typeof input === 'string' ? input : input.url;
+      try {
+        if (url.indexOf('/functions/v1/catalog') !== -1) return reply(CATALOG);
+        if (url.indexOf('/functions/v1/availability') !== -1) return reply(AVAIL);
+        if (url.indexOf('/functions/v1/bookings') !== -1) {
+          var b = init && init.body ? JSON.parse(init.body) : {};
+          if (b.action === 'create') return reply({booking: BOOKING, accessToken: 'demo-access-token', replayed: false});
+          return reply({booking: BOOKING});
+        }
+        if (url.indexOf('/functions/v1/assistant') !== -1) return reply({reply: 'Это демонстрационный режим. В рабочей версии помощник берёт данные из базы студии.', intent: 'unknown', usedTools: [], suggestions: ['Когда ближайшее окно?', 'Сколько стоит полировка?']});
+        if (url.indexOf('/functions/v1/owner') !== -1 || url.indexOf('/auth/v1') !== -1) return reply(JSON.parse(LOCK));
+      } catch (e) {}
+      return real(input, init);
+    };
+  }
+
+  var params = new URLSearchParams(location.search);
+  var forced = params.get('fallback');
+  if (forced === '1') { activate(); return; }
+  if (forced === '0') return;
+
+  var anon = window.__SUPABASE_ANON__;
+  if (!anon || anon.indexOf('http') !== 0) { activate(); return; }
+  var ctrl = new AbortController();
+  var timer = setTimeout(function () { ctrl.abort(); }, 4000);
+  fetch(anon.replace(/\/$/, '') + '/rest/v1/', {headers: {apikey: anon}, signal: ctrl.signal})
+    .then(function (res) { clearTimeout(timer); if (!res.ok) activate(); })
+    .catch(function () { clearTimeout(timer); activate(); });
 })();

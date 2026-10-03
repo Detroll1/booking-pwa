@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {Outlet, useParams} from 'react-router-dom';
+import {Outlet, useLocation, useParams} from 'react-router-dom';
 import {VStack} from '@astryxdesign/core/VStack';
 import {useCatalog} from '@/hooks/useTenant';
 import {isSupabaseConfigured} from '@/lib/supabase/client';
@@ -13,6 +13,8 @@ import {BottomNav} from './BottomNav';
 
 export function TenantLayout() {
   const {slug} = useParams();
+  const location = useLocation();
+  const isOwner = /\/owner(\/|$)/.test(location.pathname);
   const validSlug = slug && isValidSlug(slug) ? slug : null;
   const query = useCatalog(validSlug);
 
@@ -39,7 +41,7 @@ export function TenantLayout() {
   const error = validSlug ? query.error : new Error('Ссылка на студию неверна.');
 
   return (
-    <VStack gap={0} minHeight="100dvh" className="pb-nav">
+    <VStack gap={0} minHeight="100dvh" className={isOwner ? 'pb-safe' : 'pb-nav'}>
       <AsyncBoundary isLoading={query.isLoading} error={error} onRetry={() => void query.refetch()}>
         {query.data && validSlug ? (
           <TenantProvider
@@ -55,7 +57,7 @@ export function TenantLayout() {
           </TenantProvider>
         ) : null}
       </AsyncBoundary>
-      {validSlug ? <BottomNav /> : null}
+      {validSlug && !isOwner ? <BottomNav /> : null}
     </VStack>
   );
 }

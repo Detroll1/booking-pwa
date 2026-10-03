@@ -4,6 +4,7 @@ import {demoReply} from '@/lib/demo/mock';
 /** True when the demo build has no backend and mocked functions should answer. */
 export function demoMode(): boolean {
   if (import.meta.env.VITE_DEMO === 'true') return true;
+  if ((window as unknown as {__FORCE_FALLBACK?: boolean}).__FORCE_FALLBACK === true) return true;
   try {
     return new URLSearchParams(window.location.search).get('fallback') === '1';
   } catch {

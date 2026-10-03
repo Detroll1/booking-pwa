@@ -58,6 +58,9 @@ const CATALOG = {
     cancelWindowMinutes: 180,
     slotStepMinutes: 30,
     hoursSummary: ['Пн–Сб: 09:00–21:00'],
+    serviceCount: 4,
+    resourceCount: 3,
+    minPriceMinor: 350000,
     infoCards: [
       {id: 'c1', title: 'Бокс закреплён за вами', body: 'Машина занимает бокс на всё время услуги.', icon: 'shield'},
       {id: 'c2', title: 'Честные сроки', body: 'Керамика — от двух дней.', icon: 'clock'},

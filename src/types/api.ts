@@ -28,6 +28,9 @@ export interface ApiTenant {
   cancelWindowMinutes: number;
   slotStepMinutes: number;
   hoursSummary: string[];
+  serviceCount: number;
+  resourceCount: number;
+  minPriceMinor: number;
   infoCards: InfoCard[];
 }
 

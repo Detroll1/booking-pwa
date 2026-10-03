@@ -7,7 +7,7 @@ import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {isSupabaseConfigured, supabase} from '@/lib/supabase/client';
-import {ApiFailure} from '@/lib/api/client';
+import {ApiFailure, demoMode} from '@/lib/api/client';
 import {ownerPath} from '@/lib/tenant/resolve';
 
 export function OwnerLoginPage() {
@@ -42,7 +42,14 @@ export function OwnerLoginPage() {
         <Card>
           <VStack gap={2}>
             <Heading level={1}>Вход для владельца</Heading>
-            <Text type="supporting">Supabase не настроен. Инструкция — в SETUP.md.</Text>
+            {demoMode() ? (
+              <Text type="supporting">
+                Это демонстрация без базы данных, кабинет выключен. Подключите Supabase по инструкции SETUP.md — и вход,
+                записи, переносы и оплаты заработают.
+              </Text>
+            ) : (
+              <Text type="supporting">Supabase не настроен. Инструкция — в SETUP.md.</Text>
+            )}
           </VStack>
         </Card>
       </VStack>
