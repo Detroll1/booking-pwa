@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {addDays, format, subDays} from 'date-fns';
 import {
   CalendarBlank,
+  Camera,
   CaretLeft,
   CaretRight,
   Images,
@@ -10,6 +11,7 @@ import {
   Plus,
   Scissors,
   SignOut,
+  Tag,
 } from '@phosphor-icons/react';
 import {VStack} from '@astryxdesign/core/VStack';
 import {HStack} from '@astryxdesign/core/HStack';
@@ -57,7 +59,7 @@ export function OwnerSchedulePage() {
       <HStack hAlign="between" vAlign="start" gap={2}>
         <VStack gap={0}>
           <Heading level={1}>Расписание</Heading>
-          <Text type="supporting">Ваша студия</Text>
+          <Text type="supporting">{slug}</Text>
         </VStack>
         <button
           type="button"
@@ -134,6 +136,9 @@ export function OwnerSchedulePage() {
           <ActionTile to={ownerPath(slug, 'settings')} icon={MapPin} label="Контакты" />
           <ActionTile to={ownerPath(slug, 'media')} icon={Images} label="Карточки витрины" />
           <ActionTile to={ownerPath(slug, 'services')} icon={Scissors} label="Услуги" />
+          <ActionTile to={ownerPath(slug, 'settings')} icon={Tag} label="Логотип" />
+          <ActionTile to={ownerPath(slug, 'settings')} icon={Camera} label="Главное фото" />
+          <ActionTile to={ownerPath(slug, 'media')} icon={Images} label="Работы" />
         </HStack>
       </VStack>
 

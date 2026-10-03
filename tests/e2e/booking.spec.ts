@@ -16,16 +16,25 @@ test('client books a service and sees the appointment', async ({page}) => {
   await page.getByRole('link', {name: 'Записаться'}).first().click();
   await expect(page.getByRole('heading', {name: 'Запись в студию'})).toBeVisible();
 
+  // Step: intro
+  await page.getByRole('button', {name: /Выбрать время/}).click();
+
   // Step: service
-  await page.getByRole('button', {name: /Комплексная мойка/}).click();
+  await page.getByRole('button', {name: 'Выбрать'}).first().click();
 
   // Step: time
   await page.getByRole('button', {name: /10:00/}).first().click();
+  await page.getByRole('button', {name: 'Продолжить'}).click();
 
   // Step: contacts
   await page.getByLabel('Имя').fill('Тест Клиент');
   await page.getByLabel('Телефон').fill('+7 900 111-22-33');
   await page.getByLabel('Автомобиль').fill('BMW X5');
+  await page.getByRole('button', {name: 'Проверить запись'}).click();
+
+  // Step: review
+  await expect(page.getByRole('heading', {name: 'Проверьте запись'})).toBeVisible();
+  await expect(page.getByText('Заезд').first()).toBeVisible();
   await page.getByRole('button', {name: /Подтвердить запись/}).click();
 
   // Success
@@ -45,17 +54,10 @@ test('owner route requires login (no public signup)', async ({page}) => {
   await expect(page.getByText(/Публичной регистрации нет/)).toBeVisible();
 });
 
-test('assistant shows starter suggestions grounded in the studio', async ({page}) => {
+test('assistant screen offers starter suggestions grounded in the studio', async ({page}) => {
   await mockApi(page);
-  await page.route('**/mock/functions/v1/assistant', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({reply: 'Ближайшие свободные окна: завтра 10:00.', intent: 'availability', usedTools: ['get_availability'], suggestions: []}),
-    }),
-  );
-  await page.goto('/s/graphite-detailing/');
-  await page.getByRole('button', {name: 'Помощник'}).first().click();
-  await page.getByRole('button', {name: 'Когда ближайшее окно?'}).click();
-  await expect(page.getByText(/Ближайшие свободные окна/)).toBeVisible();
+  await page.goto('/s/graphite-detailing/ai');
+  await expect(page.getByRole('heading', {name: 'Запись с ИИ'})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Когда ближайшее окно?'})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Сколько стоит полировка?'})).toBeVisible();
 });

@@ -37,33 +37,32 @@ export function TenantHomePage() {
     <>
       <TenantHeader />
 
-      <section className="hero hero-grad relative flex min-h-[52vh] flex-col justify-end">
-        <VStack gap={4} paddingInline={4} paddingBlockEnd={5} className="relative z-10">
-          <VStack gap={3}>
-            <Heading level={1} type="display-2">
-              {tenant.name}
-            </Heading>
-            {tenant.tagline ? (
-              <Text type="large" color="secondary">
-                {tenant.tagline}
-              </Text>
-            ) : null}
-          </VStack>
-          <Link
-            to={tenantPath(slug, 'book')}
-            className="glass flex w-full items-center justify-between rounded-2xl px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
-          >
-            <Text type="body" weight="semibold">
-              Записаться
-            </Text>
-            <span aria-hidden className="text-tenant-accent">
-              ↗
-            </span>
-          </Link>
-        </VStack>
+      <section className="hero hero-grad relative flex min-h-[46vh] flex-col justify-end">
+        <Link
+          to={tenantPath(slug, 'book')}
+          className="glass relative z-10 mx-4 mb-5 flex items-center justify-between rounded-2xl px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
+        >
+          <Text type="body" weight="semibold">
+            Записаться
+          </Text>
+          <span aria-hidden className="text-tenant-accent">
+            ↗
+          </span>
+        </Link>
       </section>
 
       <VStack gap={6} paddingInline={4} paddingBlockEnd={8}>
+        <VStack gap={2}>
+          <Heading level={1} type="display-2">
+            {tenant.name}
+          </Heading>
+          {tenant.tagline ? (
+            <Text type="large" color="secondary">
+              {tenant.tagline}
+            </Text>
+          ) : null}
+        </VStack>
+
         <HStack gap={2} wrap="wrap">
           <StatChip icon={Wrench} value={String(tenant.serviceCount)} label="услуг в прайсе" />
           <StatChip icon={Car} value={String(tenant.resourceCount)} label="бокса в работе" />
