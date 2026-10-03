@@ -1,0 +1,686 @@
+﻿
+> booking-pwa@0.1.0 astryx
+> node node_modules/@astryxdesign/cli/clients/cli/bin/astryx.mjs component Stack Text Button Card Section AppShell MobileNav
+
+Component batch
+
+count: 7
+
+Results
+
+Stack
+
+selector: Stack
+status:   found
+
+Result
+
+# Stack
+
+Stack arranges items in a row or column with consistent spacing. Use the gap prop to control the space between items.
+
+**Import:** `import {Stack} from '@astryxdesign/core/Stack';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Stack container | Yes | Layout container that arranges content along one flex axis. |
+| Item | No | Optional StackItem wrapper that controls one item in the stack. |
+| Content | No | Caller-supplied content rendered by a Stack or StackItem. |
+
+## Best Practices
+
+- **Do:** Use the gap prop for spacing between items; don't add margins manually.
+- **Do:** Use StackItem with size="fill" to make one item stretch and fill the leftover space.
+- **Don't:** Nest stacks inside stacks; try wrap="wrap" first to let items flow to the next line.
+
+## Components
+
+### Stack
+
+Unified stack layout component with a direction prop. Use direction="horizontal" for left-to-right flow or direction="vertical" (default) for top-to-bottom. For convenience, HStack and VStack are pre-configured wrappers.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `direction` | `'horizontal' \| 'vertical'` | `'vertical'` | Direction of the stack layout. 'horizontal' flows items left-to-right (like HStack), 'vertical' flows top-to-bottom (like VStack). Note: the value is 'horizontal', NOT 'row'. |
+| `gap` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Spacing step (number literal): 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10. Pass as a JSX number expression e.g. gap={4}, NOT a string like gap="4". |
+| `padding` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inner padding on all sides, using the spacing scale. Pass as a JSX number expression e.g. padding={3}. |
+| `paddingInline` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline (horizontal) padding. Overrides padding on the inline axis when both are set. |
+| `paddingInlineStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-start padding, using the spacing scale (left in LTR, right in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingInlineEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-end padding, using the spacing scale (right in LTR, left in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingBlock` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block (vertical) padding. Overrides padding on the block axis when both are set. |
+| `paddingBlockStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-start (top) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `paddingBlockEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-end (bottom) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `isScrollable` | `boolean` | `false` | Enables scrollable overflow (overflow: auto). |
+| `width` | `SizeValue` | - | Width of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `height` | `SizeValue` | - | Height of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `maxWidth` | `SizeValue` | - | Maximum width of the stack container. |
+| `minHeight` | `SizeValue` | - | Minimum height of the stack container. |
+| `hAlign` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly' \| 'stretch'` | - | Horizontal alignment. When direction='horizontal': main-axis (justify-content). When direction='vertical': cross-axis (align-items). |
+| `vAlign` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly' \| 'stretch'` | - | Vertical alignment. When direction='horizontal': cross-axis (align-items). When direction='vertical': main-axis (justify-content). |
+| `justify` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | - | Main-axis alignment alias. Resolves to hAlign (horizontal) or vAlign (vertical). Note: use 'between', NOT 'space-between'. |
+| `align` | `'start' \| 'center' \| 'end' \| 'stretch'` | - | Cross-axis alignment alias. Mirrors CSS align-items. |
+| `wrap` | `'nowrap' \| 'wrap' \| 'wrap-reverse'` | `'nowrap'` | Flex wrap behavior. |
+| `as` | `ElementType` | `'div'` | HTML element to render as the stack container. |
+| `children` | `ReactNode` | - | Stack content. |
+| `xstyle` | `StyleXStyles` | - | StyleX styles for layout customization (margins, positioning, sizing). Must be a stylex.create() value, not an inline style object like style={{}}. |
+
+### HStack
+
+Horizontal stack for arranging items left-to-right. Supports polymorphic rendering.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `gap` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Spacing step (number literal): 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10. Pass as a JSX number expression e.g. gap={4}, NOT a string like gap="4". |
+| `padding` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inner padding on all sides, using the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10). Matches the padding prop on Card, LayoutContent, and LayoutPanel. Pass as a JSX number expression e.g. padding={3}. |
+| `paddingInline` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline (horizontal) padding, using the spacing scale. Overrides padding on the inline axis when both are set. |
+| `paddingInlineStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-start padding, using the spacing scale (left in LTR, right in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingInlineEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-end padding, using the spacing scale (right in LTR, left in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingBlock` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block (vertical) padding, using the spacing scale. Overrides padding on the block axis when both are set. |
+| `paddingBlockStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-start (top) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `paddingBlockEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-end (bottom) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `isScrollable` | `boolean` | `false` | Enables scrollable overflow (overflow: auto). Matches isScrollable on LayoutContent and LayoutPanel. |
+| `width` | `SizeValue` | - | Width of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `height` | `SizeValue` | - | Height of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `maxWidth` | `SizeValue` | - | Maximum width of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `minHeight` | `SizeValue` | - | Minimum height of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `hAlign` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | - | Horizontal (main-axis) alignment of items. |
+| `vAlign` | `'start' \| 'center' \| 'end' \| 'stretch'` | `'stretch'` | Vertical (cross-axis) alignment of items. |
+| `justify` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | - | Main-axis alignment alias for hAlign. Mirrors CSS justify-content. |
+| `align` | `'start' \| 'center' \| 'end' \| 'stretch'` | - | Cross-axis alignment alias for vAlign. Mirrors CSS align-items. |
+| `wrap` | `'nowrap' \| 'wrap' \| 'wrap-reverse'` | `'nowrap'` | Flex wrap behavior. |
+| `as` | `ElementType` | `'div'` | HTML element to render as the stack container. |
+| `children` | `ReactNode` | - | Stack content. |
+| `xstyle` | `StyleXStyles` | - | StyleX styles for layout customization (margins, positioning, sizing). Must be a stylex.create() value, not an inline style object like style={{}}. |
+
+### VStack
+
+Vertical stack for arranging items top-to-bottom. Supports polymorphic rendering.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `gap` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Spacing step (number literal): 0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10. Pass as a JSX number expression e.g. gap={4}, NOT a string like gap="4". |
+| `padding` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inner padding on all sides, using the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10). Matches the padding prop on Card, LayoutContent, and LayoutPanel. Pass as a JSX number expression e.g. padding={3}. |
+| `paddingInline` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline (horizontal) padding, using the spacing scale. Overrides padding on the inline axis when both are set. |
+| `paddingInlineStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-start padding, using the spacing scale (left in LTR, right in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingInlineEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-end padding, using the spacing scale (right in LTR, left in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingBlock` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block (vertical) padding, using the spacing scale. Overrides padding on the block axis when both are set. |
+| `paddingBlockStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-start (top) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `paddingBlockEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-end (bottom) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `isScrollable` | `boolean` | `false` | Enables scrollable overflow (overflow: auto). Matches isScrollable on LayoutContent and LayoutPanel. |
+| `width` | `SizeValue` | - | Width of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `height` | `SizeValue` | - | Height of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `maxWidth` | `SizeValue` | - | Maximum width of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `minHeight` | `SizeValue` | - | Minimum height of the stack container. Numbers are treated as pixels, strings are used as-is (e.g., '100%'). |
+| `hAlign` | `'start' \| 'center' \| 'end' \| 'stretch'` | `'stretch'` | Horizontal (cross-axis) alignment of items. |
+| `vAlign` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | - | Vertical (main-axis) alignment of items. |
+| `justify` | `'start' \| 'center' \| 'end' \| 'between' \| 'around' \| 'evenly'` | - | Main-axis alignment alias for vAlign. Mirrors CSS justify-content. |
+| `align` | `'start' \| 'center' \| 'end' \| 'stretch'` | - | Cross-axis alignment alias for hAlign. Mirrors CSS align-items. |
+| `wrap` | `'nowrap' \| 'wrap' \| 'wrap-reverse'` | `'nowrap'` | Flex wrap behavior. |
+| `as` | `ElementType` | `'div'` | HTML element to render as the stack container. |
+| `children` | `ReactNode` | - | Stack content. |
+
+### StackItem
+
+Stack item for controlling individual item behavior within a stack. Supports polymorphic rendering.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `size` | `'static' \| 'fill'` | `'static'` | Flex grow behavior: static keeps natural size, fill expands to consume remaining space. |
+| `isScrollable` | `boolean` | `false` | Enables scrollable overflow (overflow: auto). StackItem already applies the flex min-height/min-width reset, so <StackItem size="fill" isScrollable> is a complete scroll region. Matches isScrollable on LayoutContent and LayoutPanel. |
+| `crossAlignSelf` | `'start' \| 'center' \| 'end' \| 'stretch'` | - | Override the cross-axis alignment for this individual item, ignoring the parent stack alignment. |
+| `as` | `ElementType` | `'div'` | HTML element to render as the item wrapper. |
+| `children` | `ReactNode` | - | Item content. |
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-stack` | `data-direction`, `data-gap`, `data-wrap` | direction, gap, wrap | - |
+| `astryx-stack-item` | `data-size` | size | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'stack': {
+    base: { /* CSS properties */ },
+    'direction:value': { /* variant-specific */ },
+  },
+  'stack-item': {
+    base: { /* CSS properties */ },
+  },
+}
+```
+
+
+Text
+
+selector: Text
+status:   found
+
+Result
+
+# Text
+
+Text renders styled body text and headings from the theme. Use Text with a semantic type for body copy, labels, and captions, and Heading for section titles that output the correct h1тАУh6 element.
+
+**Import:** `import {Text} from '@astryxdesign/core/Text';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Text | Yes | Polymorphic text element that renders the supplied content with themed typography. |
+| Heading | No | Referenced Heading member that renders the supplied content as a semantic h1тАУh6 element. |
+| Truncation tooltip | No | Tooltip-owned surface available only when Text or Heading is measured as truncated and truncation tooltips are enabled. |
+
+## Best Practices
+
+- **Do:** Pick a semantic type (body, label, supporting, large, code) instead of manually setting size and weight; the theme handles the details.
+- **Do:** Set accessibilityLevel on Heading when the visual level differs from the document outline so screen readers announce the correct hierarchy.
+- **Do:** Use maxLines with a number to truncate long content; a tooltip appears automatically on hover so no text is lost.
+- **Do:** Enable hasTabularNumbers for columns of numeric data so digits align vertically across rows.
+- **Don't:** Override size and weight when a semantic type already matches; extra overrides fight the theme and break when themes change.
+- **Don't:** Skip heading levels in the document outline; go h1 then h2 then h3, never h1 then h3.
+- **Don't:** Use raw HTML tags like <p>, <h1>тАУ<h6>, or <span> for text; Text and Heading apply the correct theme tokens automatically.
+- **Don't:** Pass a `variant` prop; Text does not have a `variant` prop. Use `type` for semantic styling (body, label, large, supporting, code) or use Heading for headings.
+- **Don't:** Use Text for headings; use Heading with a `level` prop (1тАУ6) for section titles and headings.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `type` | `'body' \| 'large' \| 'label' \| 'supporting' \| 'code' \| 'display-1' \| 'display-2' \| 'display-3' \| 'inherit'` | `'body'` | Semantic text type. Determines size, weight, and line-height from the theme. 'inherit' takes all three from the surrounding text instead. Themes may add custom types. Note: this prop is called `type`, not `variant`. |
+| `children` | `ReactNode` | - | Text content. **(required)** |
+| `size` | `'4xs' \| '3xs' \| '2xs' \| 'xsm' \| 'sm' \| 'base' \| 'lg' \| 'xl' \| '2xl' \| '3xl' \| '4xl'` | - | Explicit font size override. Overrides the size from `type` but preserves other type properties. Prefer using `type` alone. |
+| `color` | `'primary' \| 'secondary' \| 'disabled' \| 'placeholder' \| 'accent' \| 'inherit'` | - | Text color. Defaults to 'secondary' for the 'supporting' type, 'primary' for all others. Themes may add custom colors. |
+| `weight` | `'normal' \| 'medium' \| 'semibold' \| 'bold'` | - | Font weight override. |
+| `display` | `'inline' \| 'block'` | `'inline'` | Display type. Silently overridden to 'block' when maxLines > 0 or hasCapsize is true. |
+| `as` | `'span' \| 'p' \| 'div' \| 'label'` | `'span'` | HTML element to render. |
+| `maxLines` | `number` | `0` | Maximum lines before truncation. 0 means no truncation. When set, shows a tooltip on hover if content is truncated. |
+| `hasTruncateTooltip` | `boolean \| 'above' \| 'below' \| 'start' \| 'end'` | `true` | Controls tooltip behavior for truncated text. true shows the tooltip at the default position, false disables it, or a placement string ('above' \| 'below' \| 'start' \| 'end') sets a specific position. |
+| `wordBreak` | `'break-word' \| 'break-all'` | - | Word break behavior when truncating. Defaults to 'break-all' for single-line truncation, 'break-word' otherwise. |
+| `textWrap` | `'wrap' \| 'nowrap' \| 'balance' \| 'pretty'` | - | Text wrapping behavior. |
+| `justify` | `'start' \| 'center' \| 'end'` | `'start'` | Text alignment (justification). Uses logical values (start/end) for i18n/RTL compatibility. |
+| `hasCapsize` | `boolean` | `false` | Enable optical alignment using text-box-trim. Forces block display. |
+| `hasStrikethrough` | `boolean` | `false` | Apply strikethrough text decoration. |
+| `hasTabularNumbers` | `boolean` | `false` | Use tabular (monospace) numbers for aligned numeric data. |
+| `id` | `string` | - | HTML id attribute. |
+| `xstyle` | `StyleXStyles` | - | StyleX styles for layout customization (margins, positioning, sizing). Must be a stylex.create() value: not an inline style object like style={{}}. |
+
+## Components
+
+### Heading
+
+See `npx astryx component Heading` for props and usage.
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-heading` | `data-level`, `data-color`, `data-type`, `data-weight` | level, color, type, weight | - |
+| `astryx-text` | `data-type`, `data-size`, `data-color` | type, size, color | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'heading': {
+    base: { /* CSS properties */ },
+    'level:value': { /* variant-specific */ },
+  },
+  'text': {
+    base: { /* CSS properties */ },
+  },
+}
+```
+
+
+Button
+
+selector: Button
+status:   found
+
+Result
+
+# Button
+
+Button triggers an action when clicked. Use it for form submissions, confirmations, navigation, or any interaction that needs a clear call to action.
+
+**Import:** `import {Button} from '@astryxdesign/core/Button';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Icon | No | A leading icon that reinforces the label, like a trash icon on a Delete button. |
+| Label | Yes | The visible text describing the action. Also used as the accessible name. |
+| End content | No | A trailing badge or icon after the label, like a notification count or dropdown arrow. |
+| Spinner | No | Replaces the icon during loading to show the action is in progress. |
+
+## Best Practices
+
+- **Do:** Reserve primary for the single most important action in the view. Use secondary or ghost for everything else based on emphasis.
+- **Do:** Write labels that describe the action ("Save changes", "Delete account", "Send invite"), not vague labels like "OK" or "Click here".
+- **Do:** Show a loading state for actions that take time, like saving or submitting, so the user knows it is working.
+- **Do:** Always provide a label for icon-only buttons so screen readers can announce what the button does. Add a tooltip for sighted users.
+- **Do:** For a dedicated icon-only button, use IconButton from '@astryxdesign/core/IconButton'. It is a separate component, not exported from '@astryxdesign/core/Button'.
+- **Don't:** Place more than one primary button in the same view; this dilutes the visual hierarchy.
+- **Don't:** Use the destructive variant without a confirmation step for irreversible actions like deleting data.
+- **Don't:** Use a button for navigation. If it only takes the user to another page, use a link instead. Buttons are for actions like saving, deleting, or submitting.
+
+## Accessibility
+
+- **Text label:** Button text must have at least 4.5:1 contrast with the button background in every state. For Hover and Pointer down, measure the final background after the overlay is applied.
+- **Essential icon or spinner arc:** An icon used instead of text must have at least 3:1 contrast with the button background. The moving spinner arc must also meet 3:1. An icon beside a visible label does not need its own check.
+- **Badge text:** Badge text inside a button must have at least 4.5:1 contrast with the Badge background. Check all 14 built-in Badge colors in Rest, Hover, and Pointer down on page and surface backgrounds. This covers 336 pairs per mode. Check custom end content separately.
+- **Visible control boundary:** The button edge needs 3:1 contrast only when users need it to see the control. A text-only button can rely on its label.
+- **Keyboard focus indicator:** The focus outline needs at least 3:1 contrast with the area around the button. Check every style. Destructive buttons use a red outline.
+- **Disabled appearance:** Disabled controls do not need to meet these contrast ratios.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | - | Accessible label. Rendered as visible text by default; used as aria-label when isIconOnly is true. **(required)** |
+| `variant` | `'primary' \| 'secondary' \| 'ghost' \| 'destructive'` | `'secondary'` | Visual style variant. |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Size variant. |
+| `elevation` | `'none' \| 'low' \| 'med' \| 'high'` | `'none'` | Resting shadow depth for floating buttons (e.g. a FAB). `none` is the default flat button; `low`/`med`/`high` map to the shadow token scale. Ignored inside a ButtonGroup, where elevation is owned by the group. |
+| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | HTML button type attribute. |
+| `name` | `string` | - | HTML name attribute for form submission. |
+| `value` | `string \| number \| readonly string[]` | - | HTML value attribute for form submission. |
+| `form` | `string` | - | Associates the button with a form element by ID. |
+| `isLoading` | `boolean` | `false` | Shows a loading spinner and disables interaction. Announces "Loading" via a live region. |
+| `isInterruptible` | `boolean` | `false` | Keep the button clickable while a clickAction is pending: the spinner and aria-busy still show, but the button is not disabled and the action is not deduped, so a re-click lands and interrupts the in-flight action with a fresh one. |
+| `isDisabled` | `boolean` | `false` | Disables the button. When a tooltip is present, uses aria-disabled instead of native disabled so the button stays focusable. |
+| `icon` | `ReactNode` | - | Icon element rendered before the label text. An Astryx Icon with no explicit size defaults to sm for sm/md buttons and md for lg buttons. |
+| `isIconOnly` | `boolean` | `false` | When true, renders as a square icon-only button with label as aria-label. Requires icon. Tip: for a dedicated icon-only button component, use IconButton from '@astryxdesign/core/IconButton' instead. |
+| `width` | `SizeValue` | - | Width of the button. Numbers are treated as pixels, strings are used as-is (e.g., '100%' for a full-width button). By default the button sizes to its content, never grows past its container, and truncates its label with an ellipsis when a row is too narrow; icon-only buttons stay square. |
+| `children` | `ReactNode` | - | Optional override for visible text. When provided, displayed instead of label, but label is still required (it provides the accessible name). For most cases, just use label alone: <Button label="Save" />. |
+| `endContent` | `ReactElement<IconProps> \| ReactElement<BadgeProps>` | - | Trailing icon or badge rendered after the label. Ignored when isIconOnly is true. Color is inherited from the button variant. |
+| `tooltip` | `string` | - | Tooltip text shown on hover. |
+| `onClick` | `(e: MouseEvent) => void` | - | Standard click handler (passed through from ButtonHTMLAttributes). |
+| `clickAction` | `(e: MouseEvent) => void \| Promise<void>` | - | Async click handler. Shows loading state while the returned promise is pending. |
+| `href` | `string` | - | When provided, renders the button as a link element (<a> or custom link component). The destination follows the shared navigation rule described on the Link `href` prop. |
+| `as` | `ComponentType` | - | Custom link component to use when href is provided (e.g. Next.js Link). |
+| `target` | `string` | - | HTML target attribute when rendered as a link (e.g. "_blank"). |
+| `rel` | `string` | - | HTML rel attribute when rendered as a link (e.g. "noopener noreferrer"). |
+
+## Examples
+
+### Actions in narrow rows
+
+```tsx
+
+import {useState} from 'react';
+import {Button} from '@astryxdesign/core/Button';
+import {Card} from '@astryxdesign/core/Card';
+import {Heading} from '@astryxdesign/core/Heading';
+import {HStack} from '@astryxdesign/core/HStack';
+import {Icon} from '@astryxdesign/core/Icon';
+import {IconButton} from '@astryxdesign/core/IconButton';
+import {StackItem} from '@astryxdesign/core/Stack';
+import {TextInput} from '@astryxdesign/core/TextInput';
+import {VStack} from '@astryxdesign/core/VStack';
+
+// On a phone (or any card narrower than its actions), a labelled Button
+// shrinks with its row and truncates its label with an ellipsis instead of
+// overflowing or being clipped by the card. The full label stays the
+// accessible name. Icon-only buttons keep their square size.
+function ReviewersCard() {
+  const [emails, setEmails] = useState('');
+  return (
+    <Card maxWidth={560}>
+      <VStack gap={4}>
+        <HStack gap={2} vAlign="center">
+          <StackItem size="fill">
+            <Heading level={3} maxLines={1}>
+              Design review
+            </Heading>
+          </StackItem>
+          <Button label="Request review from the design team" size="sm" />
+          <IconButton
+            label="More review options"
+            icon={<Icon icon="moreHorizontal" />}
+            variant="ghost"
+            size="sm"
+          />
+        </HStack>
+        <TextInput
+          label="Reviewer emails"
+          placeholder="name@example.com"
+          value={emails}
+          onChange={setEmails}
+        />
+        {/* In a 320px form footer the long primary action truncates.
+            StackItem size="static" keeps the short Cancel label whole. */}
+        <HStack gap={2} hAlign="end">
+          <StackItem size="static">
+            <Button label="Cancel" variant="secondary" />
+          </StackItem>
+          <Button label="Send invitations to all 12 reviewers" variant="primary" />
+        </HStack>
+      </VStack>
+    </Card>
+  );
+}
+
+```
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-button` | `data-size`, `data-variant`, `data-elevation` | primary, secondary, ghost, destructive | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'button': {
+    base: { /* CSS properties */ },
+    'size:value': { /* variant-specific */ },
+  },
+}
+```
+
+**Themeable CSS variables** - additional properties that can be overridden in `defineTheme` component overrides.
+
+| CSS Variable | Default | Description |
+|-------------|---------|-------------|
+| `--button-focus-offset` | `var(--focus-outline-offset)` | Focus ring outline offset |
+| `--button-icon-only-aspect` | `1 / 1` | Aspect ratio for icon-only buttons |
+
+Some properties are set via standard CSS in component overrides:
+```ts
+components: {
+  button: {
+    base: {
+      borderRadius: '...',
+    },
+  },
+}
+```
+
+
+Card
+
+selector: Card
+status:   found
+
+Result
+
+# Card
+
+Card is a bordered, elevated container for discrete, self-contained items: things you could reorder, remove, or interact with independently. Cards are NOT the default layout tool. Most content groups don't need a container at all; spacing and alignment create visual grouping naturally. Only reach for a Card when items need clear interaction boundaries or visual comparison in a grid.
+
+**Import:** `import {Card} from '@astryxdesign/core/Card';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Container | Yes | The outer box with border, background, border-radius, and padding. |
+| Content | Yes | Any children rendered inside the card. Often a stack of heading, text, and actions. |
+
+## Best Practices
+
+- **Do:** Ask "could I reorder or remove this independently?" If yes, it's a card. If no, it's just a section of the page: use a heading + Stack or Section.
+- **Do:** Use cards for discrete items: a single user profile, a single notification, a single metric, a product in a grid. Each card represents one "thing" with clear interaction boundaries.
+- **Do:** Spacing and alignment alone create visual grouping. Not everything needs a container; try removing the card and see if the grouping is still clear from whitespace and typography.
+- **Do:** Keep padding consistent across sibling cards so they align visually in a grid or list.
+- **Do:** Pair a card with Layout when you need a structured header, scrollable content, and footer with actions.
+- **Don't:** Default to cards for visual grouping. A heading + Stack with proper spacing creates hierarchy without adding borders everywhere. Cards should be the exception, not the default.
+- **Don't:** Wrap page sections in cards. "General Settings", "Notification Preferences", form groups: these are page regions, use Section or heading + stack.
+- **Don't:** Create identical card grids (icon + heading + text, repeated). Vary the layout or question whether cards are needed at all.
+- **Don't:** Nest cards inside other cards; flatten the hierarchy or use spacing and dividers instead.
+- **Don't:** Use color variants for status; use Banner or Badge for that. Color cards are for categorization.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `width` | `SizeValue` | - | Width of the card (number = pixels, string = used as-is). |
+| `height` | `SizeValue` | - | Height of the card (number = pixels, string = used as-is). |
+| `maxWidth` | `SizeValue` | - | Maximum width of the card. |
+| `minHeight` | `SizeValue` | - | Minimum height of the card. |
+| `children` | `ReactNode` | - | Content to render inside the card. |
+| `padding` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | `the theme's card padding (spacing step 4 with no theme)` | Internal padding using the spacing scale. Omit it and the card takes the theme's card padding rather than a step, so passing a step is a decision to override the theme, not a way to restate the default. |
+| `variant` | `'default' \| 'transparent' \| 'muted' \| 'blue' \| 'cyan' \| 'gray' \| 'green' \| 'orange' \| 'pink' \| 'purple' \| 'red' \| 'teal' \| 'yellow'` | `'default'` | Background color variant. `default` uses the standard card background. `transparent` drops the background entirely. `muted` uses the muted background for de-emphasised cards. The non-semantic variants use the corresponding `--color-background-<name>` token. |
+| `elevation` | `'none' \| 'low' \| 'med' \| 'high'` | `'none'` | Resting shadow depth. `none` is flat; `low`/`med`/`high` map to the shadow token scale. Raise a card only when it needs to float above surrounding content. |
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-card` | `data-variant`, `data-elevation` | default, transparent, muted, blue, cyan, gray, green, orange, pink, purple, red, teal, yellow | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'card': {
+    base: { /* CSS properties */ },
+    'variant:value': { /* variant-specific */ },
+  },
+}
+```
+
+Some properties are set via standard CSS in component overrides:
+```ts
+components: {
+  card: {
+    base: {
+      borderRadius: '...',
+      padding: '...',  // expands to container layout tokens
+    },
+  },
+}
+```
+
+
+Section
+
+selector: Section
+status:   found
+
+Result
+
+# Section
+
+Section is the correct way to create page regions and group related content on a page. Use it for settings groups, form sections, sidebar areas, or any time you need visual separation between parts of a page. If you are tempted to use a Card for a page section, use Section instead.
+
+**Import:** `import {Section} from '@astryxdesign/core/Section';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Section container | Yes | Painted container that groups a page region. |
+| Consumer content | No | Caller-provided content rendered inside the section container. |
+
+## Best Practices
+
+- **Do:** Use Section for page-level grouping: settings panels, form groups, sidebar regions. These are sections of a page, not discrete items.
+- **Do:** Start with the default variant. Use muted only to call attention to a specific region.
+- **Do:** Add dividers between same-background sections that need separation.
+- **Do:** Combine with a heading + Stack for a typical page section pattern.
+- **Don't:** Use Card when you mean Section. Cards are for discrete items (one notification, one profile). Sections are for page regions.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'section' \| 'transparent' \| 'muted'` | `'section'` | Background variant applied to the section container. |
+| `width` | `SizeValue` | - | Width of the section; a number is interpreted as pixels, a string is used as-is. |
+| `height` | `SizeValue` | - | Height of the section; a number is interpreted as pixels, a string is used as-is. |
+| `maxWidth` | `SizeValue` | - | Maximum width of the section. |
+| `minHeight` | `SizeValue` | - | Minimum height of the section. |
+| `children` | `ReactNode` | - | Content rendered inside the section. |
+| `dividers` | `Array<'top' \| 'bottom' \| 'start' \| 'end'>` | - | Which sides of the section have divider borders. |
+| `padding` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | `4` | Internal padding using the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10). Use padding={0} for edge-to-edge content. |
+| `paddingInline` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline (horizontal) padding override. Overrides only the inline-axis padding while preserving block padding from `padding` or the container theme default. Accepts the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10). |
+| `paddingInlineStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-start padding override (left in LTR, right in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingInlineEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Inline-end padding override (right in LTR, left in RTL). Overrides paddingInline and padding on that edge only. |
+| `paddingBlock` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block (vertical) padding override. Overrides only the block-axis padding while preserving inline padding from `padding` or the container theme default. Accepts the spacing scale (0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10). |
+| `paddingBlockStart` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-start (top) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `paddingBlockEnd` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | - | Block-end (bottom) padding, using the spacing scale. Overrides paddingBlock and padding on that edge only. |
+| `xstyle` | `StyleXStyles` | - | StyleX styles for layout customization (margins, positioning, sizing). Must be a stylex.create() value, not an inline style object. |
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-section` | `data-variant` | section, transparent, muted | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'section': {
+    base: { /* CSS properties */ },
+    'variant:value': { /* variant-specific */ },
+  },
+}
+```
+
+
+AppShell
+
+selector: AppShell
+status:   found
+
+Result
+
+# AppShell
+
+AppShell is the page shell for an application. It provides slots for top navigation, side navigation, banners, and main content. Use it as the root wrapper for every page. It handles responsive mobile navigation and skip-to-content automatically. Configure side nav collapse on SideNav with its collapsible prop.
+
+**Import:** `import {AppShell} from '@astryxdesign/core/AppShell';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Page shell | Yes | Outermost application frame that owns page-level navigation, responsive shell behavior, and the main content landmark. |
+| Skip link | Yes | First focusable element on the page. Visually hidden until focused, then moves focus to the main content area. |
+| Banner | No | The banner slot, for system-wide announcements. Renders above the top nav, inside the banner landmark. |
+| Top navigation | No | The topNav slot, typically TopNav. Below the mobile breakpoint it becomes a compact bar carrying the nav toggle. |
+| Side navigation | No | The sideNav slot, typically SideNav. Inline above the breakpoint, moved into the mobile drawer below it. |
+| Main content | Yes | children, rendered in the main landmark. Scrolls internally when height is fill, and with the page when it is auto. |
+| Mobile nav drawer | No | Generated below the breakpoint from the nav slots unless mobileNav disables or replaces it. A modal dialog: it traps focus and returns focus to the toggle on close. |
+
+## Best Practices
+
+- **Do:** Choose the right height: use "fill" for dashboards with internal scrolling and "auto" for pages that grow with content.
+- **Do:** Set `contentPadding` based on content type: 4 for forms and settings, 0 for tables and dashboards.
+- **Do:** Give every nav slot an accessible name. AppShell renders TopNav and SideNav as separate navigation landmarks, and a screen reader lists them by name, so pass `label` to each one.
+- **Do:** Start the page heading inside `children`. AppShell owns the skip link, the banner landmark and the main landmark, but it renders no heading, so the first heading in the content area is the page h1.
+- **Don't:** Nest one AppShell inside another; it's the outermost layout frame.
+- **Don't:** Use for sub-page layouts; use Layout for content areas within AppShell.
+- **Don't:** Add your own skip link or <main> element. AppShell already renders both, and a second main landmark makes the first ambiguous.
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | - | Main content area, rendered inside a <main> element. |
+| `contentPadding` | `0 \| 0.5 \| 1 \| 1.5 \| 2 \| 3 \| 4 \| 5 \| 6 \| 8 \| 10` | `0` | Padding for the main content area. Set based on the dominant content pattern: 4 (16px) for forms/settings/text, 0 for dashboards/maps/tables. Override individual sections with Section. |
+| `topNav` | `ReactNode` | - | Top navigation slot, typically TopNav. |
+| `sideNav` | `ReactNode` | - | Side navigation slot, typically SideNav. |
+| `mobileNav` | `ReactNode` | - | Mobile navigation configuration. Accepts false (disable), a config object (tune auto behavior), or ReactNode (full custom drawer). The config object is {hasToggle?: boolean, isOpen?: boolean, onOpenChange?: (isOpen: boolean) => void, content?: ReactNode, breakpoint?: 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| 'none', defaultIsMobile?: boolean}; breakpoint defaults to 'md', resolves through the nearest Theme's widthBreakpoints, and switches to the wider layout at equality. 'none' is always non-mobile and ignores defaultIsMobile. |
+| `banner` | `ReactNode` | - | Banner slot for system-wide announcements, placed above the topNav. |
+| `height` | `'fill' \| 'auto'` | `'fill'` | Height behavior: 'fill' makes the shell fill the viewport (100dvh) with independent scroll containers; 'auto' lets the shell grow with content and uses sticky positioning for nav. |
+| `variant` | `'wash' \| 'surface' \| 'section' \| 'elevated'` | `'elevated'` | Navigation background style controlling how nav areas contrast with content. 'wash' uses wash background, 'surface' uses surface background, 'section' adds dividers between nav and content, 'elevated' uses wash nav with elevated surface content and border radius. |
+| `xstyle` | `StyleXStyles` | - | StyleX styles for layout customization (margins, positioning, sizing). Must be a stylex.create() value, not an inline style object like style={{}}. |
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-app-shell` | `data-variant` | wash, surface, section, elevated | - |
+| `astryx-app-shell-header` | `data-variant` | wash, surface, section, elevated | - |
+| `astryx-app-shell-sidenav` | `data-variant` | wash, surface, section, elevated | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'app-shell': {
+    base: { /* CSS properties */ },
+    'variant:value': { /* variant-specific */ },
+  },
+  'app-shell-header': {
+    base: { /* CSS properties */ },
+  },
+}
+```
+
+
+MobileNav
+
+selector: MobileNav
+status:   found
+
+Result
+
+# MobileNav
+
+A slide-out drawer for mobile navigation. MobileNav is the mobile counterpart to SideNav and accepts the same children. Use it on narrow viewports where a persistent sidebar is not practical. Inside AppShell, use MobileNavToggle as the trigger; it reads state from context automatically.
+
+**Import:** `import {MobileNav} from '@astryxdesign/core/MobileNav';`
+
+## Anatomy
+
+| Element | Required | Description |
+|---------|----------|-------------|
+| Navigation overlay | Yes | Full-viewport dialog overlay that hosts the mobile navigation drawer. |
+| Drawer | Yes | Painted panel that slides in from the resolved viewport edge. |
+| Header | Yes | Fixed row containing optional header content and the close button. |
+| Content | Yes | Scrollable region containing the navigation content. |
+| Close button | Yes | Button that closes the navigation drawer. |
+| Toggle button | No | AppShell-aware Button that opens or closes the drawer on mobile viewports. |
+
+## Best Practices
+
+- **Do:** Share the same nav items between MobileNav and SideNav by extracting them into a variable.
+- **Do:** Provide a header when the drawer's purpose is not obvious from its content.
+- **Do:** Inside AppShell, use MobileNavToggle to open the drawer; it reads state from context. Do not pass isOpen/onOpenChange to the toggle.
+- **Don't:** Use MobileNav on desktop: use a persistent SideNav instead.
+
+## Components
+
+### MobileNav
+
+A slide-out drawer for mobile navigation. Accepts SideNav children.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `isOpen` | `boolean` | - | Whether the drawer is open. Inside AppShell, this is managed automatically via context. Outside AppShell, provide this prop to control the drawer yourself. |
+| `onOpenChange` | `(isOpen: boolean) => void` | - | Called when the drawer visibility changes (backdrop click, Escape key, or close button). Inside AppShell, this is managed automatically via context. |
+| `children` | `ReactNode` | - | Drawer content: typically SideNavSection/SideNavItem, or any ReactNode. **(required)** |
+| `header` | `ReactNode` | - | Header content for the drawer. Rendered next to the close button. Pass a string for a simple text heading, or a ReactNode for custom content (logo, search bar, etc.). |
+| `width` | `number` | `320` | Drawer width in pixels. Capped at 85vw to prevent overflow on small screens. |
+| `side` | `'start' \| 'end' \| 'auto'` | `'auto'` | Which side the drawer slides from. Start is left in LTR, right in RTL. Auto picks a side based on the trigger position. |
+
+### MobileNavToggle
+
+Hamburger button that opens/closes the mobile nav drawer. Reads open state from AppShell context automatically: does NOT accept isOpen or onOpenChange props. Renders nothing above the mobile breakpoint.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | - | Custom content to render instead of the default hamburger icon. |
+| `label` | `string` | `'Open navigation'` | Accessible label for the toggle button. |
+
+## Theming
+
+| Component class | Preferred data attributes | Props | States |
+|-----------------|---------------------------|-------|--------|
+| `astryx-mobile-nav` | `data-side` | side | - |
+
+Override in defineTheme:
+```ts
+components: {
+  'mobile-nav': {
+    base: { /* CSS properties */ },
+    'side:value': { /* variant-specific */ },
+  },
+}
+```
+

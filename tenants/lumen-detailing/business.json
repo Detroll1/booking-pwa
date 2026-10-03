@@ -1,0 +1,44 @@
+{
+  "slug": "lumen-detailing",
+  "name": "LUMEN Detailing",
+  "tagline": "Светлый детейлинг в Екатеринбурге",
+  "description": "Экспресс-мойка и защитные покрытия. Два поста, запись без звонков.",
+  "accent": "#22c55e",
+  "timezone": "Asia/Yekaterinburg",
+  "currency": "RUB",
+  "locale": "ru-RU",
+  "status": "preview",
+  "phone": "+7 343 000-20-20",
+  "address": "Екатеринбург, ул. Малышева, 51",
+  "mapUrl": "https://yandex.ru/maps/",
+  "heroImage": "images/hero.jpg",
+  "logoImage": "images/logo.png",
+  "bookingLeadMinutes": 120,
+  "cancelWindowMinutes": 720,
+  "slotStepMinutes": 60,
+  "resources": [
+    {"name": "Пост A", "kind": "bay"},
+    {"name": "Пост детейлинга", "kind": "station"}
+  ],
+  "services": [
+    {"name": "Экспресс-мойка", "description": "Быстрая мойка кузова", "price": 1200, "durationMinutes": 40, "bufferBeforeMinutes": 5, "bufferAfterMinutes": 5, "resourceKind": "bay"},
+    {"name": "Полировка фар", "description": "Восстановление прозрачности фар", "price": 6000, "durationMinutes": 120, "bufferBeforeMinutes": 15, "bufferAfterMinutes": 15, "resourceKind": "station"},
+    {"name": "Нанокерамика", "description": "Однодневное защитное покрытие", "price": 45000, "durationMinutes": 1440, "bufferBeforeMinutes": 30, "bufferAfterMinutes": 30, "resourceKind": "station"}
+  ],
+  "hours": {
+    "tue": [{"start": "10:00", "end": "20:00"}],
+    "wed": [{"start": "10:00", "end": "20:00"}],
+    "thu": [{"start": "10:00", "end": "20:00"}],
+    "fri": [{"start": "10:00", "end": "20:00"}],
+    "sat": [{"start": "10:00", "end": "20:00"}],
+    "sun": [{"start": "10:00", "end": "20:00"}]
+  },
+  "works": [
+    {"image": "images/work-1.jpg", "caption": "Экспресс-мойка кроссовера"},
+    {"image": "images/work-2.jpg", "caption": "Полировка фар"}
+  ],
+  "infoCards": [
+    {"title": "Быстрая запись", "body": "Онлайн без звонков, подтверждение сразу.", "icon": "sparkle"},
+    {"title": "Защита на год", "body": "Нанокерамика держится до 12 месяцев.", "icon": "shield"}
+  ]
+}

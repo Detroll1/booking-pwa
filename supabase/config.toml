@@ -1,0 +1,39 @@
+# Supabase CLI project configuration (local dev + deploy).
+project_id = "booking-pwa"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+major_version = 17
+
+[auth]
+enabled = true
+# Public owner signup is intentionally disabled; owners are provisioned by admin.
+enable_signup = false
+
+[functions.catalog]
+verify_jwt = false
+
+[functions.availability]
+verify_jwt = false
+
+[functions.bookings]
+verify_jwt = false
+
+[functions.ical]
+verify_jwt = false
+
+[functions.assistant]
+verify_jwt = false
+
+[functions.owner]
+verify_jwt = true
+
+[functions.notifications-worker]
+verify_jwt = false
+
+[storage]
+enabled = true

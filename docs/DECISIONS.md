@@ -1,0 +1,108 @@
+# Принятые решения
+
+Краткая запись технических решений и отклонений от буквы плана, где актуальные
+версии вели себя иначе.
+
+## Версии и инструменты
+
+- **TypeScript 5.9, не 7.** `npm view typescript version` даёт 7.x, но текущий
+  `typescript-eslint` с ним несовместим. Взято `^5.9.3`; `strict`,
+  `noUncheckedIndexedAccess`, `noImplicitOverride`, `noFallthroughCasesInSwitch`,
+  `verbatimModuleSyntax`, `erasableSyntaxOnly`, `moduleResolution: bundler`.
+- **Vite 8 / Vitest 5 / React 19.3 / zod 4.** Установились и собрались без правок.
+- **npm 11 `allowScripts`.** npm 11 отклоняет `--allow-scripts` при project-install
+  и требует поле `allowScripts` в `package.json` (добавлено для Astryx и
+  embedded-postgres). Из-за этого `npx shadcn add drawer` падает (пытается
+  поставить пакет `cn`), поэтому компоненты shadcn добавлены вручную — см. ниже.
+- **embedded-postgres 17.10.0-beta.17.** Актуальный тег был 18.x-beta; взята
+  стабильно работающая 17.x-бета для локального Postgres в SQL-тестах и `db:start`.
+
+## shadcn/ui
+
+- Стиль `base-nova`. Drawer — **одна ветка на Base UI** (`@base-ui/react/drawer`),
+  файл `src/components/ui/drawer.tsx`. Vaul-пропсы не используются; смешения
+  веток нет. CLI shadcn не сработал (см. `allowScripts`), поэтому Drawer написан
+  в том же стиле (cva-совместимая композиция + `cn`).
+
+## Astryx + тема
+
+- `appTheme` расширяет neutral, тёмный, спокойный. Акцент — не константа:
+  токен `--color-accent` указывает на `var(--tenant-accent)`, которую рантайм
+  выставляет из `business.json` (`src/lib/tenant/theme.ts`). Бизнес-строк в
+  `src/` нет.
+- Тема собрана для продакшна: `astryx theme build src/themes/app/appTheme.ts` →
+  `app.css` + `app.js`; подключены в `globals.css` и `AppProviders`. Figtree
+  подгружается через Google Fonts в `index.html`.
+- CSS-слои заданы до импортов; token-backed утилиты Tailwind через
+  `@astryxdesign/core/tailwind-theme.css`.
+
+## Безопасность и токены
+
+- **Токен записи детерминированный:** `token = HMAC(secret, tenant:booking)`,
+  в БД хранится только `sha256(token)`. Это позволяет выполнить требование
+  «в БД только hash» и одновременно «retry выдаёт тот же доступ» — при повторном
+  запросе токен пересчитывается и совпадает с хешем. Секрет `ACCESS_TOKEN_SECRET`
+  серверный; смена секрета инвалидирует старые ссылки (задокументировано).
+- **Схема `public`, строгие GRANT:** у `anon` нет прав на таблицы; `authenticated`
+  видит только строки своих tenant через RLS; мутации идут через Edge Functions
+  с service-role. `current_user_id()` читает `request.jwt.claim.sub`, не завязываясь
+  на схему `auth`, — поэтому RLS-тесты идут на обычном Postgres.
+- Composite FK `(tenant_id, id)` во всех дочерних таблицах — строка не может
+  сослаться на чужой tenant.
+
+## Планирование и БД
+
+- `resource_occupancies` с `EXCLUDE USING gist (tenant_id =, resource_id =, during &&)`
+  объединяет брони и ручные блоки. Создание/перенос/отмена — атомарные функции
+  PL/pgSQL (одна транзакция). Неудачный перенос откатывает удаление старой
+  занятости → исходная бронь не теряется.
+- Доступность считает **SQL** (`rpc_get_availability`), а не клиент и не модель.
+- Клиент не передаёт цену, tenant и длительность — они берутся из услуги в БД.
+- Статистика (`rpc_stats`) считает заезды, выполненные заказы и полученные
+  платежи раздельно; будущая стоимость называется «upcoming», а не выручкой.
+
+## PWA и конвейер
+
+- Общий билд; PWA-артефакты per-tenant генерирует `tenant:publish` в
+  `dist/s/<slug>/`: `manifest.webmanifest` (свой id/start_url/scope), иконки,
+  maskable, apple-touch-icon, per-tenant `index.html`, scoped `sw.js`. Имена
+  кэшей и scope привязаны к slug. Рантайм дополнительно применяет title,
+  theme-color, apple-touch-icon и manifest из каталога.
+- **Переиздание конфига сохраняет данные:** услуги и ресурсы сопоставляются по
+  имени (историю заездов сохраняем), заменяются только демо-фото; фото владельца
+  (`is_owner_uploaded=true`) и брони не трогаются.
+- В `import.meta.env.DEV` сервис-воркер не регистрируется (нет сгенерированных
+  tenant-воркеров); в проде регистрируется scoped воркер студии.
+
+## Помощник (бесплатный, без платного ИИ)
+
+- По требованию заказчика платный LLM удалён: пакет `openai`, ключи `LLM_*` и
+  вызовы API убраны полностью. Помощник остаётся, но работает **бесплатно и
+  детерминированно**: роутер интентов маршрутизирует вопрос к серверному
+  SQL-инструменту (`get_services`, `get_availability`, `get_tenant_info`,
+  `get_stats`, `get_schedule`) и отвечает только по реальным данным студии.
+- Канонический роутер — `src/lib/assistant/router.ts` (чистый, юнит-тестируется),
+  Edge Function переиспользует его через `_shared/assistant-router.ts`.
+  Инструменты клиента и владельца разделены; SQL и tenant выбирает сервер.
+- Лимит частоты — атомарный счётчик в БД. Обычная запись не зависит от помощника.
+
+## Хостинг
+
+- Фронтенд — **Cloudflare Pages (бесплатный тариф)**: `public/_redirects`
+  (`/* /index.html 200`) для глубоких ссылок, `public/_headers` для кэша,
+  `npm run deploy:cf` для деплоя. Бэкенд — Supabase (free tier). Платных
+  сервисов нет.
+
+## Осознанные отклонения
+
+- `Reveal` (плавное появление секций) использует один служебный `<div>`-обёртку:
+  это поведенческая анимация, а не layout. Всё остальное построено на компонентах
+  Astryx; герой-секция — семантический `<section>`.
+- Preview-студии: задания уведомлений создаются, но воркер помечает их `skipped`,
+  реальная доставка не выполняется (требование плана).
+
+## Проверки версий/сборки
+
+- `npm run typecheck` — 0; `npm run lint` — 0; `npm run test` — 21; `npm run test:sql` — 12;
+  `npm run build` — успех; `npm run test:e2e` — 3 passed / 1 skipped.
+- `package-lock.json` зафиксирован.

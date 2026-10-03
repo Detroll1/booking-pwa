@@ -1,0 +1,49 @@
+﻿Docs tree
+
+cli          Commands, programmatic APIs, integration authoring, and output contracts. - @astryxdesign/cli
+unorganized  Every topic that no section places yet. Each keeps its own name; open one by it. - @astryxdesign/cli
+
+Topics
+
+authoring             Every file an integration author writes, field by field: the integration manifest, astryx.config,
+                      codemods, identity, and each doc type. - @astryxdesign/cli
+browser-support       What browsers Astryx targets, which modern platform features it depends on, and how to support
+                      older browsers for your own audience. - @astryxdesign/cli
+color                 Semantic color tokens for surfaces, text, icons, borders, and status indicators. -
+                      @astryxdesign/cli
+elevation             Shadow tokens for visual elevation and inset state rings. - @astryxdesign/cli
+getting-started       Add the design system to your project and start building. - @astryxdesign/cli
+icons                 Semantic icon names available in the design system. These adapt to the active theme's icon
+                      registry. - @astryxdesign/cli
+illustrations         Illustration guidelines for empty states, onboarding flows, and feature highlights. -
+                      @astryxdesign/cli
+internationalization  Set the active locale for astryx components, load locale catalogs, coexist with your own i18n
+                      library, swap languages at runtime, and test translations with the pseudo locale. -
+                      @astryxdesign/cli
+layout                Build an app layout outside-in: scaffold the regions, structure the content, tune the spacing,
+                      then adapt across widths. - @astryxdesign/cli
+migration             How to migrate an existing Tailwind, shadcn, or Radix application to the design system
+                      incrementally. - @astryxdesign/cli
+motion                Duration and easing tokens for animations and transitions. - @astryxdesign/cli
+principles            Core design principles and rules for building with the design system. - @astryxdesign/cli
+shape                 Border radius tokens for consistent component rounding, from sharp corners to full pills. -
+                      @astryxdesign/cli
+spacing               Spacing scale tokens for padding, gap, and margin: the rhythmic foundation of design system
+                      layouts. - @astryxdesign/cli
+styling-libraries     Integrate Tailwind, StyleX, Panda, Chakra, MUI, CSS-in-JS, CSS Modules, and non-CSS renderers with
+                      system tokens. - @astryxdesign/cli
+styling               How to customize component appearance: xstyle prop, Tailwind, StyleX, className, rest props,
+                      compound component patterns, theming hooks, and styling-library interop. - @astryxdesign/cli
+theme                 Theme provider, custom themes, theme build for production/SSR, light/dark mode, and component
+                      style overrides. - @astryxdesign/cli
+tokens                Complete reference for color, data visualization, syntax, spacing, size, border, focus, radius,
+                      shadow, motion, and typography tokens. - @astryxdesign/cli
+typography            Font families, geometric type scale, weight, line-height, and semantic text tokens for consistent,
+                      accessible text styling. - @astryxdesign/cli
+working-with-ai       How to set up AI coding tools to generate correct component code. - @astryxdesign/cli
+
+Usage: npx @astryxdesign/cli docs <topic>                  list a topic's sections
+       npx @astryxdesign/cli docs <topic> <section>        read one section
+       npx @astryxdesign/cli docs <topic> --full           read the whole topic
+       npx @astryxdesign/cli docs cli/api                  go down the docs tree one level at a time
+With --json, a topic returns its whole doc; add --index for its section list.
