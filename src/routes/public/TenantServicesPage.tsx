@@ -5,13 +5,16 @@ import {Text} from '@astryxdesign/core/Text';
 import {useTenantContext} from '@/app/TenantContext';
 import {ServiceRow} from '@/components/booking/ServiceRow';
 import {AsyncBoundary} from '@/components/AsyncBoundary';
+import {TenantHeader} from '@/components/layout/TenantHeader';
 
 export function TenantServicesPage() {
   const {tenant, services} = useTenantContext();
   const {slug = ''} = useParams();
 
   return (
-    <VStack gap={4} padding={4} paddingBlockEnd={8}>
+    <>
+      <TenantHeader />
+      <VStack gap={4} padding={4} paddingBlockEnd={8}>
       <VStack gap={1}>
         <Heading level={1}>Услуги и цены</Heading>
         <Text type="supporting">
@@ -25,6 +28,7 @@ export function TenantServicesPage() {
           ))}
         </VStack>
       </AsyncBoundary>
-    </VStack>
+      </VStack>
+    </>
   );
 }

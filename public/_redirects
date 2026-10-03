@@ -1,4 +1,1 @@
-# SPA fallback for Cloudflare Pages: deep links like /s/<slug>/book serve the
-# app shell; the app reads the slug from the URL and renders the right studio.
-# Existing static files (dist/s/<slug>/index.html, assets, sw.js) win over this.
 /*    /index.html    200

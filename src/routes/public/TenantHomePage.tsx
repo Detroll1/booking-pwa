@@ -1,21 +1,19 @@
 import {useParams} from 'react-router-dom';
 import {Link} from 'react-router-dom';
-import {Clock, MapPin, Phone, ShieldCheck, Sparkle, Star} from '@phosphor-icons/react';
+import {Car, Clock, MapPin, Phone, ShieldCheck, Sparkle, Star, Wrench, Tag} from '@phosphor-icons/react';
 import type {Icon} from '@phosphor-icons/react';
 import {VStack} from '@astryxdesign/core/VStack';
 import {HStack} from '@astryxdesign/core/HStack';
 import {StackItem} from '@astryxdesign/core/Stack';
 import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
-import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
-import {Section} from '@astryxdesign/core/Section';
-import {Divider} from '@astryxdesign/core/Divider';
 import {useTenantContext} from '@/app/TenantContext';
 import {ServiceRow} from '@/components/booking/ServiceRow';
 import {WorkGallery} from '@/components/booking/WorkGallery';
 import {AssistantSheet} from '@/components/assistant/AssistantSheet';
 import {Reveal} from '@/components/layout/Reveal';
+import {TenantHeader} from '@/components/layout/TenantHeader';
+import {formatMoney} from '@/lib/money';
 import {tenantPath} from '@/lib/tenant/resolve';
 
 const CARD_ICONS: Record<string, Icon> = {
@@ -31,53 +29,71 @@ export function TenantHomePage() {
   const {tenant, services, works} = useTenantContext();
   const {slug = ''} = useParams();
   const previewServices = services.slice(0, 4);
+  const minPrice = Number.isFinite(tenant.minPriceMinor)
+    ? formatMoney(tenant.minPriceMinor, tenant.currency, tenant.locale)
+    : null;
 
   return (
     <>
-      <section className="hero hero-grad flex min-h-[58vh] flex-col justify-end">
-        <VStack gap={4} padding={4} paddingBlockEnd={6} className="relative z-10">
-          <VStack gap={2}>
-            <HStack gap={2} vAlign="center">
-              {tenant.logoUrl ? (
-                <img src={tenant.logoUrl} alt="" className="h-10 w-10 rounded-full border border-border object-cover" />
-              ) : null}
-              <Heading level={1}>{tenant.name}</Heading>
-            </HStack>
+      <TenantHeader />
+
+      <section className="hero hero-grad relative flex min-h-[52vh] flex-col justify-end">
+        <VStack gap={4} paddingInline={4} paddingBlockEnd={5} className="relative z-10">
+          <VStack gap={3}>
+            <Heading level={1} type="display-2">
+              {tenant.name}
+            </Heading>
             {tenant.tagline ? (
               <Text type="large" color="secondary">
                 {tenant.tagline}
               </Text>
             ) : null}
           </VStack>
-          <VStack gap={2}>
-            <Heading level={2}>Запись в студию</Heading>
-            <Button
-              label="Записаться"
-              variant="primary"
-              size="lg"
-              width="100%"
-              href={tenantPath(slug, 'book')}
-            />
-          </VStack>
+          <Link
+            to={tenantPath(slug, 'book')}
+            className="glass flex w-full items-center justify-between rounded-2xl px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
+          >
+            <Text type="body" weight="semibold">
+              Записаться
+            </Text>
+            <span aria-hidden className="text-tenant-accent">
+              ↗
+            </span>
+          </Link>
         </VStack>
       </section>
 
-      <VStack gap={6} padding={4} paddingBlockEnd={8}>
+      <VStack gap={6} paddingInline={4} paddingBlockEnd={8}>
+        <HStack gap={2} wrap="wrap">
+          <StatChip icon={Wrench} value={String(tenant.serviceCount)} label="услуг в прайсе" />
+          <StatChip icon={Car} value={String(tenant.resourceCount)} label="бокса в работе" />
+          {minPrice ? <StatChip icon={Tag} value={`от ${minPrice}`} label="за услугу" wide /> : null}
+        </HStack>
+
         {tenant.description ? (
           <Reveal>
-            <Section variant="transparent" padding={0}>
-              <Text type="body" color="secondary">
-                {tenant.description}
-              </Text>
-            </Section>
+            <Text type="body" color="secondary">
+              {tenant.description}
+            </Text>
           </Reveal>
         ) : null}
 
         <Reveal>
-          <HStack gap={2} vAlign="center" hAlign="between">
-            <Text type="supporting">Есть вопрос? Помощник ответит по свободному времени и ценам.</Text>
+          <VStack gap={3}>
+            <Heading level={2}>Запись в студию</Heading>
+            <HStack gap={3} vAlign="center" className="rounded-2xl border border-border bg-surface p-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl tenant-accent-soft text-tenant-accent">
+                <Sparkle size={20} weight="fill" aria-hidden />
+              </span>
+              <VStack gap={0}>
+                <Text type="body" weight="semibold">
+                  Свежий вид для вашего авто
+                </Text>
+                <Text type="supporting">Выберите услугу и удобное время — остальное возьмём на себя</Text>
+              </VStack>
+            </HStack>
             <AssistantSheet slug={slug} scope="client" />
-          </HStack>
+          </VStack>
         </Reveal>
 
         <Reveal>
@@ -113,17 +129,15 @@ export function TenantHomePage() {
               {tenant.infoCards.map((card) => {
                 const CardIcon = CARD_ICONS[card.icon ?? 'sparkle'] ?? Sparkle;
                 return (
-                  <Card key={card.id}>
-                    <HStack gap={3} vAlign="start">
-                      <CardIcon size={22} className="text-tenant-accent" aria-hidden />
-                      <VStack gap={1}>
-                        <Text type="body" weight="semibold">
-                          {card.title}
-                        </Text>
-                        <Text type="supporting">{card.body}</Text>
-                      </VStack>
-                    </HStack>
-                  </Card>
+                  <HStack key={card.id} gap={3} vAlign="start" className="rounded-2xl border border-border bg-surface p-3">
+                    <CardIcon size={22} className="text-tenant-accent" aria-hidden />
+                    <VStack gap={0}>
+                      <Text type="body" weight="semibold">
+                        {card.title}
+                      </Text>
+                      <Text type="supporting">{card.body}</Text>
+                    </VStack>
+                  </HStack>
                 );
               })}
             </VStack>
@@ -133,7 +147,6 @@ export function TenantHomePage() {
         <Reveal>
           <VStack gap={3}>
             <Heading level={2}>Как найти и когда работаем</Heading>
-            <Divider />
             <VStack gap={2}>
               {tenant.address ? (
                 <HStack gap={2} vAlign="center">
@@ -172,13 +185,45 @@ export function TenantHomePage() {
         </Reveal>
 
         <Reveal>
-          <HStack gap={2} hAlign="center">
-            <StackItem size="fill">
-              <Button label="Записаться" variant="secondary" width="100%" href={tenantPath(slug, 'book')} />
-            </StackItem>
-          </HStack>
+          <Link
+            to={tenantPath(slug, 'book')}
+            className="flex w-full items-center justify-center rounded-2xl border border-border bg-surface px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
+          >
+            <Text type="body" weight="semibold">
+              Записаться
+            </Text>
+          </Link>
         </Reveal>
       </VStack>
     </>
+  );
+}
+
+function StatChip({
+  icon: ChipIcon,
+  value,
+  label,
+  wide = false,
+}: {
+  icon: Icon;
+  value: string;
+  label: string;
+  wide?: boolean;
+}) {
+  return (
+    <HStack
+      gap={2}
+      vAlign="center"
+      className={`rounded-2xl border border-border bg-surface px-3 py-2 ${wide ? 'flex-1' : ''}`}
+    >
+      <ChipIcon size={18} className="text-tenant-accent" aria-hidden />
+      <VStack gap={0}>
+        <Text type="body" weight="semibold" hasTabularNumbers>
+          {value}
+        </Text>
+        <Text type="supporting">{label}</Text>
+      </VStack>
+      <StackItem size="static" />
+    </HStack>
   );
 }

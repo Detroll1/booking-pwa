@@ -3,10 +3,11 @@ import {createRoot} from 'react-dom/client';
 import {RouterProvider} from 'react-router-dom';
 import {AppProviders} from '@/app/AppProviders';
 import {router} from '@/app/router';
-import {registerServiceWorker} from '@/lib/pwa/register';
 import '@/styles/globals.css';
 
-registerServiceWorker();
+if (!import.meta.env.VITE_DEMO) {
+  void import('@/lib/pwa/register').then((m) => m.registerServiceWorker());
+}
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root element #root not found');

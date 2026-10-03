@@ -1,4 +1,4 @@
-import {Navigate, createBrowserRouter} from 'react-router-dom';
+import {Navigate, createBrowserRouter, createHashRouter} from 'react-router-dom';
 import {defaultTenantSlug, tenantPath} from '@/lib/tenant/resolve';
 import {TenantLayout} from '@/components/layout/TenantLayout';
 import {TenantHomePage} from '@/routes/public/TenantHomePage';
@@ -15,7 +15,10 @@ import {OwnerStatsPage} from '@/routes/owner/OwnerStatsPage';
 import {OwnerSettingsPage} from '@/routes/owner/OwnerSettingsPage';
 import {NotFoundPage} from '@/routes/NotFoundPage';
 
-export const router = createBrowserRouter([
+// On a static host without rewrite rules (e.g. GitHub Pages) the app builds a
+// hash router so every deep link resolves to the served index.html. The primary
+// Cloudflare Pages target uses the normal history router.
+export const router = (import.meta.env.VITE_HASH_ROUTER === 'true' ? createHashRouter : createBrowserRouter)([
   {path: '/', element: <Navigate to={tenantPath(defaultTenantSlug())} replace />},
   {
     path: '/s/:slug',
