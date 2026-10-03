@@ -12,7 +12,27 @@
     Object.defineProperty(navigator, 'locks', {value: {request: function () { return Promise.resolve(); }}, configurable: true});
   } catch (e) {}
   var params = new URLSearchParams(location.search);
-  if (params.get('fallback') !== '1') return;
+  var forced = params.get('fallback');
+  if (forced === '0') return;
+  if (forced === '1') { activate(); return; }
+
+  // No explicit flag: with a configured live Supabase URL, check whether it
+  // actually answers; if it does not (or returns non-JSON), route to local demo.
+  var anon = window.__SUPABASE_ANON__;
+  if (!anon || anon.indexOf('http') !== 0) return;
+  var ctrl = new AbortController();
+  var timer = setTimeout(function () { ctrl.abort(); }, 4000);
+  real(anon.replace(/\/$/, '') + '/rest/v1/', {headers: {apikey: anon}, signal: ctrl.signal})
+    .then(function (res) { clearTimeout(timer); if (!res.ok) activate(); })
+    .catch(function () { clearTimeout(timer); activate(); });
+
+  function activate() {
+    window.__FORCE_FALLBACK = true;
+    var url = new URL(location.href);
+    url.searchParams.set('fallback', '1');
+    location.replace(url.toString());
+  }
+});
 
   var slot = function (h, m) { var d = new Date(); d.setUTCDate(d.getUTCDate() + 1); d.setUTCHours(h - 3, m, 0, 0); return d.toISOString(); };
   var BOOKING = {
