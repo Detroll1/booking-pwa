@@ -35,6 +35,7 @@ test('client books a service and sees the appointment', async ({page}) => {
   // Step: review
   await expect(page.getByRole('heading', {name: 'Проверьте запись'})).toBeVisible();
   await expect(page.getByText('Заезд').first()).toBeVisible();
+  await page.getByRole('button', {name: /Передать эти данные студии/}).click();
   await page.getByRole('button', {name: /Подтвердить запись/}).click();
 
   // Success
