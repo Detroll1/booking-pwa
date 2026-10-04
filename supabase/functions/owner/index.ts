@@ -204,6 +204,10 @@ Deno.serve((request) =>
         await rpc(client, 'rpc_owner_delete_media', {p_tenant_id: tenantId, p_id: String(body.id)});
         return json({ok: true});
 
+      case 'set-cards':
+        await rpc(client, 'rpc_owner_set_cards', {p_tenant_id: tenantId, p_cards: body.cards ?? []});
+        return json({ok: true});
+
       case 'update-tenant':
         return json({tenant: await rpc(client, 'rpc_owner_update_tenant', {p_tenant_id: tenantId, p_patch: body.patch ?? {}})});
 

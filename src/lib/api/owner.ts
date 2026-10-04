@@ -84,6 +84,8 @@ export const ownerApi = {
   updateTenant: (token: string, slug: string, patch: Record<string, unknown>) =>
     ownerCall<{ok: true}>(token, 'update-tenant', {slug, patch}),
   jobs: (token: string, slug: string) => ownerCall<{jobs: ApiNotificationJob[]}>(token, 'jobs', {slug}),
+  setCards: (token: string, slug: string, cards: {title: string; body: string; icon: string | null}[]) =>
+    ownerCall<{ok: true}>(token, 'set-cards', {slug, cards}),
   hours: (token: string, slug: string) =>
     ownerCall<{hours: {weekday: number; windows: {startMin: number; endMin: number}[]}[]}>(token, 'hours', {slug}),
   media: (token: string, slug: string) =>

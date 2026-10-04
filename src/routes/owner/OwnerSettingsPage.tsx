@@ -36,6 +36,7 @@ export function OwnerSettingsPage() {
 
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [hours, setHours] = useState<{weekday: number; windows: {startMin: number; endMin: number}[]}[]>([]);
+  const [cards, setCards] = useState<{title: string; body: string; icon: string | null}[]>([]);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -63,6 +64,19 @@ export function OwnerSettingsPage() {
   useEffect(() => {
     if (hoursQuery.data?.hours) setHours(hoursQuery.data.hours);
   }, [hoursQuery.data]);
+
+  useEffect(() => {
+    if (catalog.data?.tenant.infoCards) {
+      setCards(catalog.data.tenant.infoCards.map((c) => ({title: c.title, body: c.body, icon: c.icon})));
+    }
+  }, [catalog.data]);
+
+  function saveCards() {
+    void ownerApi
+      .setCards(session.access_token, slug, cards.filter((c) => c.title.trim()))
+      .then(() => client.invalidateQueries({queryKey: ['catalog', slug]}))
+      .then(() => setSaved(true));
+  }
 
   function save() {
     updateTenant.mutate(
@@ -165,6 +179,25 @@ export function OwnerSettingsPage() {
           );
         })}
         <Button label="Сохранить часы" variant="secondary" onClick={saveHours} />
+      </VStack>
+
+      <Divider />
+
+      <VStack gap={3}>
+        <Heading level={2}>Карточки витрины</Heading>
+        <Text type="supporting">Три информационные карточки на главной странице.</Text>
+        <VStack gap={3}>
+          {cards.map((card, index) => (
+            <div key={index} className="rounded-2xl border border-border bg-surface p-3">
+              <VStack gap={2}>
+                <TextInput label="Заголовок" value={card.title} onChange={(v) => setCards((prev) => prev.map((c, i) => (i === index ? {...c, title: v} : c)))} />
+                <TextInput label="Текст" value={card.body} onChange={(v) => setCards((prev) => prev.map((c, i) => (i === index ? {...c, body: v} : c)))} />
+                <TextInput label="Иконка" value={card.icon ?? ''} onChange={(v) => setCards((prev) => prev.map((c, i) => (i === index ? {...c, icon: v} : c)))} />
+              </VStack>
+            </div>
+          ))}
+        </VStack>
+        <Button label="Сохранить карточки" variant="secondary" onClick={saveCards} />
       </VStack>
 
       {saved ? <Text type="supporting">Сохранено.</Text> : null}
