@@ -126,6 +126,8 @@ export function BookingFlowPage() {
     contact: 'Ваши данные',
     review: 'Проверьте запись',
   };
+  const stepNumbers: Partial<Record<Step, number>> = {service: 1, time: 2, contact: 3, review: 4};
+  const stepNumber = stepNumbers[step];
 
   return (
     <Drawer open onOpenChange={(open) => !open && close()} modal swipeDirection="down">
@@ -136,7 +138,12 @@ export function BookingFlowPage() {
               {showBack ? (
                 <Button label="Назад" variant="ghost" size="sm" icon={<ArrowLeft size={16} />} onClick={back} />
               ) : null}
-              <Heading level={2}>{titles[step] ?? 'Запись в студию'}</Heading>
+              <VStack gap={0}>
+                <Heading level={2}>{titles[step] ?? 'Запись в студию'}</Heading>
+                {stepNumber ? (
+                  <Text type="supporting">Шаг {stepNumber} из 4</Text>
+                ) : null}
+              </VStack>
             </HStack>
             <DrawerClose className="rounded-md px-2 py-1 text-sm text-secondary hover:text-primary">Закрыть</DrawerClose>
           </HStack>
@@ -145,18 +152,16 @@ export function BookingFlowPage() {
         </DrawerHeader>
 
         {step === 'intro' ? (
-          <VStack gap={4}>
-            <HStack gap={3} vAlign="center" className="rounded-2xl border border-border bg-surface p-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl tenant-accent-soft text-tenant-accent">
-                <Sparkle size={24} weight="fill" aria-hidden />
+          <VStack gap={4} paddingInline={1} paddingBlock={2}>
+            <VStack gap={3} align="center" className="rounded-3xl border border-border bg-surface px-5 py-8">
+              <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-tenant-accent text-white">
+                <Sparkle size={32} weight="fill" aria-hidden />
               </span>
-              <VStack gap={1}>
-                <Text type="body" weight="semibold">
-                  Свежий вид для вашего авто
-                </Text>
-                <Text type="supporting">Выберем услугу и удобное время — остальное возьмём на себя</Text>
-              </VStack>
-            </HStack>
+              <Heading level={3}>Свежий вид для вашего авто</Heading>
+              <Text type="supporting" justify="center">
+                Выберем услугу и удобное время — остальное возьмём на себя
+              </Text>
+            </VStack>
             <Button label="Выбрать время" variant="primary" size="lg" width="100%" icon={<CaretRight size={18} />} onClick={() => setStep('service')} />
           </VStack>
         ) : null}
@@ -168,14 +173,15 @@ export function BookingFlowPage() {
             ) : (
               services.map((s) => (
                 <div key={s.id} className="rounded-2xl border border-border bg-surface p-3">
-                  <HStack gap={2} vAlign="center" hAlign="between">
-                    <VStack gap={1}>
+                  <HStack gap={3} vAlign="center">
+                    <VStack gap={1} className="flex-1">
                       <Text type="body" weight="semibold">
                         {s.name}
                       </Text>
+                      {s.description ? <Text type="supporting">{s.description}</Text> : null}
                       <Text type="supporting">{s.durationMinutes} мин</Text>
                     </VStack>
-                    <VStack gap={1} hAlign="end">
+                    <VStack gap={2} hAlign="end" className="shrink-0">
                       <Text type="body" weight="semibold">
                         {formatMoney(s.priceMinor, s.currency, tenant.locale)}
                       </Text>

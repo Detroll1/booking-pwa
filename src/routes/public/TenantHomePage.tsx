@@ -37,19 +37,21 @@ export function TenantHomePage() {
     <>
       <TenantHeader />
 
-      <section className="hero hero-grad relative flex min-h-[46vh] flex-col justify-end">
-        <Link
-          to={tenantPath(slug, 'book')}
-          className="glass relative z-10 mx-4 mb-5 flex items-center justify-between rounded-2xl px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
-        >
-          <Text type="body" weight="semibold">
-            Записаться
-          </Text>
-          <span aria-hidden className="text-tenant-accent">
-            ↗
-          </span>
-        </Link>
-      </section>
+      <div className="hero relative mx-4 mt-2 overflow-hidden rounded-3xl border border-border">
+        <div className="hero-grad relative z-10 flex min-h-[260px] flex-col justify-end p-4">
+          <Link
+            to={tenantPath(slug, 'book')}
+            className="glass flex items-center justify-between rounded-2xl px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
+          >
+            <Text type="body" weight="semibold">
+              Записаться
+            </Text>
+            <span aria-hidden className="text-tenant-accent">
+              ↗
+            </span>
+          </Link>
+        </div>
+      </div>
 
       <VStack gap={6} paddingInline={4} paddingBlockEnd={8}>
         <VStack gap={2}>
@@ -181,17 +183,6 @@ export function TenantHomePage() {
               ) : null}
             </VStack>
           </VStack>
-        </Reveal>
-
-        <Reveal>
-          <Link
-            to={tenantPath(slug, 'book')}
-            className="flex w-full items-center justify-center rounded-2xl border border-border bg-surface px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
-          >
-            <Text type="body" weight="semibold">
-              Записаться
-            </Text>
-          </Link>
         </Reveal>
       </VStack>
     </>

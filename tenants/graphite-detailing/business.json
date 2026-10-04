@@ -22,10 +22,16 @@
     {"name": "Пост полировки", "kind": "station"}
   ],
   "services": [
+    {"name": "Экспресс-мойка", "description": "Кузов и диски без очереди", "price": 1500, "durationMinutes": 60, "bufferBeforeMinutes": 5, "bufferAfterMinutes": 5, "resourceKind": "bay"},
     {"name": "Комплексная мойка", "description": "Кузов, диски, салон, воск", "price": 3500, "durationMinutes": 90, "bufferBeforeMinutes": 10, "bufferAfterMinutes": 10, "resourceKind": "bay"},
+    {"name": "Химчистка салона", "description": "Глубокая химчистка текстиля и кожи", "price": 12000, "durationMinutes": 240, "bufferBeforeMinutes": 15, "bufferAfterMinutes": 15, "resourceKind": "bay"},
+    {"name": "Озонирование салона", "description": "Устранение запахов", "price": 2500, "durationMinutes": 45, "bufferBeforeMinutes": 10, "bufferAfterMinutes": 10, "resourceKind": "bay"},
+    {"name": "Полировка фар", "description": "Возврат прозрачности фар", "price": 6000, "durationMinutes": 120, "bufferBeforeMinutes": 15, "bufferAfterMinutes": 15, "resourceKind": "station"},
+    {"name": "Детейлинг дисков", "description": "Очистка и защита", "price": 4500, "durationMinutes": 120, "bufferBeforeMinutes": 10, "bufferAfterMinutes": 10, "resourceKind": "station"},
     {"name": "Полировка кузова", "description": "Абразивная полировка в 2 этапа", "price": 18000, "durationMinutes": 300, "bufferBeforeMinutes": 30, "bufferAfterMinutes": 30, "resourceKind": "station"},
-    {"name": "Керамическое покрытие", "description": "Двухдневная защита кузова керамикой", "price": 65000, "durationMinutes": 2880, "bufferBeforeMinutes": 60, "bufferAfterMinutes": 60, "resourceKind": "station"},
-    {"name": "Химчистка салона", "description": "Глубокая химчистка текстиля и кожи", "price": 12000, "durationMinutes": 240, "bufferBeforeMinutes": 15, "bufferAfterMinutes": 15, "resourceKind": "bay"}
+    {"name": "Керамическое покрытие", "description": "Защита кузова на 1 день", "price": 35000, "durationMinutes": 1440, "bufferBeforeMinutes": 30, "bufferAfterMinutes": 30, "resourceKind": "station"},
+    {"name": "Керамика двухдневная", "description": "Максимальная защита кузова", "price": 65000, "durationMinutes": 2880, "bufferBeforeMinutes": 60, "bufferAfterMinutes": 60, "resourceKind": "station"},
+    {"name": "Защитная плёнка", "description": "Бампер и зоны риска", "price": 15000, "durationMinutes": 360, "bufferBeforeMinutes": 30, "bufferAfterMinutes": 30, "resourceKind": "station"}
   ],
   "hours": {
     "mon": [{"start": "09:00", "end": "21:00"}],
