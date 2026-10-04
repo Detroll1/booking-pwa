@@ -51,7 +51,7 @@ const CATALOG = {
     phone: '+7 495 000-10-10',
     address: 'Москва, ул. Автозаводская, 18, бокс 4',
     mapUrl: null,
-    heroImageUrl: null,
+    heroImageUrl: '/hero.jpg',
     logoUrl: null,
     social: {},
     bookingLeadMinutes: 60,

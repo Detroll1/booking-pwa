@@ -123,7 +123,7 @@ export function BookingFlowPage() {
   const titles: Partial<Record<Step, string>> = {
     service: 'Выбери услугу',
     time: 'Дата и время',
-    contact: 'Ваши контакты',
+    contact: 'Ваши данные',
     review: 'Проверьте запись',
   };
 

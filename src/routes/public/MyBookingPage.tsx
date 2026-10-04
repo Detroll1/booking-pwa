@@ -16,6 +16,7 @@ import {useBookingByToken, useCancelBooking, useSubscribeReminder} from '@/hooks
 import {formatZoned} from '@/lib/time/tz';
 import {formatMoney} from '@/lib/money';
 import {ApiFailure} from '@/lib/api/client';
+import {tenantPath} from '@/lib/tenant/resolve';
 import type {ApiBooking, BookingStatus} from '@/types/api';
 
 const STATUS_LABEL: Record<BookingStatus, string> = {
@@ -92,13 +93,13 @@ export function MyBookingPage() {
       <>
         <TenantHeader />
         <VStack gap={3} padding={4} paddingBlockEnd={8}>
-        <Heading level={1}>Моя запись</Heading>
-        <AsyncBoundary
-          isEmpty
-          emptyTitle="Ссылка на запись не найдена"
-          emptyHint="Откройте ссылку из подтверждения записи или запишитесь заново."
-        />
-        <Button label="Записаться" variant="primary" width="100%" href={`/s/${slug}/book`} />
+          <Button label="На главную" variant="ghost" size="sm" href={tenantPath(slug)} />
+          <Heading level={1}>Профиль клиента</Heading>
+          <Text type="body" color="secondary">
+            Сохраняйте новые записи в одном месте. Открывайте их с любого устройства.
+          </Text>
+          <Text type="supporting">Профиль не нужен — мы отправим ссылку для входа после записи.</Text>
+          <Button label="Получить ссылку" variant="primary" width="100%" href={tenantPath(slug, 'book')} />
         </VStack>
       </>
     );
