@@ -93,7 +93,18 @@ export function TenantHomePage() {
                 <Text type="supporting">Выберите услугу и удобное время — остальное возьмём на себя</Text>
               </VStack>
             </HStack>
-            <AssistantSheet slug={slug} scope="client" />
+            <HStack gap={2}>
+              <Link
+                to={tenantPath(slug, 'ai')}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-tenant-accent tenant-accent-soft px-4 py-3 text-tenant-accent"
+              >
+                <Sparkle size={18} weight="fill" aria-hidden />
+                <Text type="body" weight="semibold" color="inherit">
+                  Запись с ИИ
+                </Text>
+              </Link>
+              <AssistantSheet slug={slug} scope="client" />
+            </HStack>
           </VStack>
         </Reveal>
 
