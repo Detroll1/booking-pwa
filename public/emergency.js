@@ -32,7 +32,7 @@
     description: 'Глубокая мойка, полировка и защитные покрытия. Бокс закреплён за вами на всё время услуги.',
     accent: '#4690ff', timezone: 'Europe/Moscow', currency: 'RUB', locale: 'ru-RU', status: 'live',
     phone: '+7 495 000-10-10', address: 'Москва, ул. Автозаводская, 18, бокс 4', mapUrl: null,
-    heroImageUrl: null, logoUrl: null, social: {}, bookingLeadMinutes: 60, cancelWindowMinutes: 180,
+    heroImageUrl: '/hero.jpg', logoUrl: null, social: {}, bookingLeadMinutes: 60, cancelWindowMinutes: 180,
     slotStepMinutes: 30, hoursSummary: ['Пн–Сб: 09:00–21:00'],
     serviceCount: 4, resourceCount: 3, minPriceMinor: 350000,
     infoCards: [
