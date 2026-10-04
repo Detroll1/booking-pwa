@@ -1,6 +1,5 @@
 import {NavLink, useParams} from 'react-router-dom';
-import {GridFour, House, Ticket} from '@phosphor-icons/react';
-import {HStack} from '@astryxdesign/core/HStack';
+import {GridFour, House, CalendarCheck} from '@phosphor-icons/react';
 import {Text} from '@astryxdesign/core/Text';
 import {tenantPath} from '@/lib/tenant/resolve';
 import {cn} from '@/lib/utils';
@@ -8,19 +7,15 @@ import {cn} from '@/lib/utils';
 const ITEMS = [
   {to: '', label: 'Главная', icon: House, end: true},
   {to: 'services', label: 'Услуги', icon: GridFour, end: false},
-  {to: 'booking', label: 'Моя запись', icon: Ticket, end: false},
+  {to: 'booking', label: 'Моя запись', icon: CalendarCheck, end: false},
 ] as const;
 
-/**
- * Glass bottom navigation. It is position:fixed and the page adds matching
- * bottom padding (pb-nav) so content is never hidden behind it. Height is
- * exposed as --bottom-nav-height for safe-area math.
- */
+/** Floating glass pill bottom navigation, matching the original design. */
 export function BottomNav() {
   const {slug = ''} = useParams();
   return (
-    <nav aria-label="Основная навигация" className="glass fixed inset-x-0 bottom-0 z-40 border-t pb-safe">
-      <HStack gap={0} hAlign="evenly" paddingInline={2} minHeight={72} paddingBlockStart={2}>
+    <nav aria-label="Основная навигация" className="fixed inset-x-0 bottom-0 z-40 flex justify-center pb-safe">
+      <div className="glass mb-3 flex items-center gap-1 rounded-full border px-2 py-1.5 shadow-lg">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           return (
@@ -30,19 +25,19 @@ export function BottomNav() {
               end={item.end}
               className={({isActive}) =>
                 cn(
-                  'flex flex-1 flex-col items-center justify-center gap-1 rounded-lg py-2 transition-colors',
-                  isActive ? 'text-tenant-accent' : 'text-secondary hover:text-primary',
+                  'flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors',
+                  isActive ? 'bg-tenant-accent text-white' : 'text-secondary hover:text-primary',
                 )
               }
             >
-              <Icon size={24} weight="duotone" aria-hidden />
+              <Icon size={18} weight={undefined} aria-hidden />
               <Text type="supporting" color="inherit">
                 {item.label}
               </Text>
             </NavLink>
           );
         })}
-      </HStack>
+      </div>
     </nav>
   );
 }

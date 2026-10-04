@@ -205,18 +205,16 @@ export function BookingFlowPage() {
 
         {step === 'time' && service ? (
           <VStack gap={4}>
-            <div className="rounded-2xl border border-border bg-surface p-3">
-              <HStack gap={2} vAlign="center" hAlign="between">
-                <VStack gap={0}>
-                  <Text type="body" weight="semibold">
-                    {service.name}
-                  </Text>
-                  <Text type="supporting">{formatMoney(service.priceMinor, service.currency, tenant.locale)}</Text>
-                </VStack>
-              </HStack>
-            </div>
+            <HStack gap={2} vAlign="center" hAlign="between">
+              <Text type="body" weight="semibold">
+                {service.name}
+              </Text>
+              <Text type="body" weight="semibold" hasTabularNumbers>
+                {formatMoney(service.priceMinor, service.currency, tenant.locale)}
+              </Text>
+            </HStack>
 
-            <HStack gap={2} isScrollable>
+            <HStack gap={2} isScrollable paddingBlock={1}>
               {(availability.data?.days ?? []).map((d) => {
                 const date = new Date(`${d.date}T12:00:00Z`);
                 const disabled = d.isClosed || d.slots.length === 0;
@@ -231,15 +229,15 @@ export function BookingFlowPage() {
                       setStartAt(null);
                     }}
                     className={cn(
-                      'shrink-0 rounded-xl border px-2 py-2 text-center',
-                      active ? 'border-tenant-accent tenant-accent-soft' : 'border-border bg-surface',
+                      'flex h-16 w-12 shrink-0 flex-col items-center justify-center rounded-2xl border text-center',
+                      active ? 'border-tenant-accent bg-tenant-accent text-white' : 'border-border bg-surface',
                       disabled && 'opacity-40',
                     )}
                   >
                     <Text type="supporting" color={active ? 'inherit' : 'secondary'}>
                       {formatZoned(date, 'EEE', tenant.timezone)}
                     </Text>
-                    <Text type="body" weight={active ? 'semibold' : 'medium'} hasTabularNumbers>
+                    <Text type="large" weight="semibold" color="inherit" hasTabularNumbers>
                       {formatZoned(date, 'd', tenant.timezone)}
                     </Text>
                   </button>
@@ -247,27 +245,27 @@ export function BookingFlowPage() {
               })}
             </HStack>
 
-            <HStack gap={2} vAlign="center" hAlign="between">
-              <VStack gap={0}>
-                <Text type="supporting">Другая дата</Text>
-                <Text type="body" weight="semibold" hasTabularNumbers>
+            <VStack gap={1}>
+              <Text type="supporting">Другая дата</Text>
+              <label className="relative flex h-12 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface">
+                <Text type="body" weight="medium" hasTabularNumbers>
                   {selectedDate ? formatZoned(new Date(`${selectedDate}T12:00:00Z`), 'd MMM yyyyг.', tenant.timezone) : ''}
                 </Text>
-              </VStack>
-              <input
-                type="date"
-                aria-label="Другая дата"
-                min={todayKey}
-                value={selectedDate}
-                onChange={(e) => {
-                  if (e.target.value) {
-                    setSelectedDate(e.target.value);
-                    setStartAt(null);
-                  }
-                }}
-                className="rounded-xl border border-border bg-surface px-3 py-2 text-primary"
-              />
-            </HStack>
+                <input
+                  type="date"
+                  aria-label="Другая дата"
+                  min={todayKey}
+                  value={selectedDate}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setSelectedDate(e.target.value);
+                      setStartAt(null);
+                    }
+                  }}
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                />
+              </label>
+            </VStack>
 
             <AsyncBoundary
               isLoading={availability.isLoading}
@@ -286,8 +284,8 @@ export function BookingFlowPage() {
                       type="button"
                       onClick={() => setStartAt(slot)}
                       className={cn(
-                        'rounded-lg border px-3 py-2',
-                        active ? 'border-tenant-accent tenant-accent-soft' : 'border-border bg-surface',
+                        'rounded-full border px-4 py-2',
+                        active ? 'border-tenant-accent bg-tenant-accent text-white' : 'border-border bg-surface text-primary',
                       )}
                     >
                       <Text type="body" weight="medium" hasTabularNumbers>

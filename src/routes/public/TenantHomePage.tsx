@@ -37,20 +37,19 @@ export function TenantHomePage() {
     <>
       <TenantHeader />
 
-      <div className="hero relative mx-4 mt-2 overflow-hidden rounded-3xl border border-border">
-        <div className="hero-grad relative z-10 flex min-h-[260px] flex-col justify-end p-4">
-          <Link
-            to={tenantPath(slug, 'book')}
-            className="glass flex items-center justify-between rounded-2xl px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
-          >
-            <Text type="body" weight="semibold">
-              Записаться
-            </Text>
-            <span aria-hidden className="text-tenant-accent">
-              ↗
-            </span>
-          </Link>
-        </div>
+      <div className="hero relative mx-4 mt-2 min-h-[240px] overflow-hidden rounded-3xl border border-border">
+        <div className="hero-grad absolute inset-0" />
+        <Link
+          to={tenantPath(slug, 'book')}
+          className="glass absolute inset-x-3 bottom-3 z-10 flex items-center justify-between rounded-full px-4 py-3 text-primary transition-colors hover:border-tenant-accent"
+        >
+          <Text type="body" weight="semibold">
+            Записаться
+          </Text>
+          <span aria-hidden className="text-tenant-accent">
+            ↗
+          </span>
+        </Link>
       </div>
 
       <VStack gap={6} paddingInline={4} paddingBlockEnd={8}>
@@ -65,11 +64,21 @@ export function TenantHomePage() {
           ) : null}
         </VStack>
 
-        <HStack gap={2} wrap="wrap">
+        <HStack gap={2}>
           <StatChip icon={Wrench} value={String(tenant.serviceCount)} label="услуг в прайсе" />
           <StatChip icon={Car} value={String(tenant.resourceCount)} label="бокса в работе" />
-          {minPrice ? <StatChip icon={Tag} value={`от ${minPrice}`} label="за услугу" wide /> : null}
         </HStack>
+        {minPrice ? (
+          <div className="flex items-center justify-between rounded-2xl border border-border bg-surface px-3 py-2">
+            <HStack gap={2} vAlign="center">
+              <Tag size={18} className="text-tenant-accent" aria-hidden />
+              <Text type="large" weight="semibold">
+                от {minPrice}
+              </Text>
+            </HStack>
+            <Text type="supporting">за услугу</Text>
+          </div>
+        ) : null}
 
         {tenant.description ? (
           <Reveal>
@@ -93,6 +102,15 @@ export function TenantHomePage() {
                 <Text type="supporting">Выберите услугу и удобное время — остальное возьмём на себя</Text>
               </VStack>
             </HStack>
+            <Link
+              to={tenantPath(slug, 'book')}
+              className="glass flex items-center justify-between rounded-full bg-tenant-accent px-4 py-3 text-white transition-colors"
+            >
+              <Text type="body" weight="semibold" color="inherit">
+                Выбрать время
+              </Text>
+              <span aria-hidden>↗</span>
+            </Link>
             <HStack gap={2}>
               <Link
                 to={tenantPath(slug, 'ai')}

@@ -1,4 +1,5 @@
 import {formatInTimeZone, fromZonedTime, toZonedTime} from 'date-fns-tz';
+import {ru} from 'date-fns/locale';
 
 export interface ZonedParts {
   year: number;
@@ -29,9 +30,9 @@ export function zonedDateKey(instant: Date, timeZone: string): string {
   return formatInTimeZone(instant, timeZone, 'yyyy-MM-dd');
 }
 
-/** Format an instant using a date-fns format string in the studio timezone. */
+/** Format an instant using a date-fns format string in the studio timezone (Russian locale). */
 export function formatZoned(instant: Date, format: string, timeZone: string): string {
-  return formatInTimeZone(instant, timeZone, format);
+  return formatInTimeZone(instant, timeZone, format, {locale: ru});
 }
 
 /** Build a UTC instant from wall-clock parts interpreted in the studio timezone. */
