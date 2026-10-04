@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, CaretRight, CheckCircle, Clock, MapPin, Sparkle, StarFour} from '@phosphor-icons/react';
+import {CaretRight, CheckCircle, Clock, MapPin, Sparkle, StarFour} from '@phosphor-icons/react';
 import {VStack} from '@astryxdesign/core/VStack';
 import {HStack} from '@astryxdesign/core/HStack';
 import {Text} from '@astryxdesign/core/Text';
@@ -32,6 +32,12 @@ type Step = 'intro' | 'service' | 'time' | 'contact' | 'review' | 'success';
 
 const EMPTY_CUSTOMER: ApiCustomer = {name: '', phone: '', car: '', comment: ''};
 
+function formatDuration(minutes: number): string {
+  if (minutes < 60) return `${minutes} мин`;
+  if (minutes < 1440) return `${Math.round(minutes / 60)} ч`;
+  return `${Math.round(minutes / 1440)} д`;
+}
+
 export function BookingFlowPage() {
   const {slug = ''} = useParams();
   const [params] = useSearchParams();
@@ -44,6 +50,7 @@ export function BookingFlowPage() {
   const [startAt, setStartAt] = useState<string | null>(null);
   const [customer, setCustomer] = useState<ApiCustomer>(EMPTY_CUSTOMER);
   const [showErrors, setShowErrors] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [confirmed, setConfirmed] = useState<ApiBooking | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
@@ -73,13 +80,6 @@ export function BookingFlowPage() {
     setSelectedDate('');
     setStartAt(null);
     setStep('time');
-  }
-
-  function back() {
-    if (step === 'review') setStep('contact');
-    else if (step === 'contact') setStep('time');
-    else if (step === 'time') setStep('service');
-    else if (step === 'service') setStep('intro');
   }
 
   function toReview() {
@@ -119,11 +119,10 @@ export function BookingFlowPage() {
     setCustomer({name: 'Демо клиент', phone: '+7 999 123-45-67', car: 'Марка и модель', comment: ''});
   }
 
-  const showBack = step !== 'intro' && step !== 'success';
   const titles: Partial<Record<Step, string>> = {
     service: 'Выбери услугу',
     time: 'Дата и время',
-    contact: 'Ваши данные',
+    contact: 'Ваш автомобиль',
     review: 'Проверьте запись',
   };
   const stepNumbers: Partial<Record<Step, number>> = {service: 1, time: 2, contact: 3, review: 4};
@@ -135,9 +134,6 @@ export function BookingFlowPage() {
         <DrawerHeader>
           <HStack gap={2} vAlign="center" hAlign="between">
             <HStack gap={2} vAlign="center">
-              {showBack ? (
-                <Button label="Назад" variant="ghost" size="sm" icon={<ArrowLeft size={16} />} onClick={back} />
-              ) : null}
               <VStack gap={0}>
                 <Heading level={2}>{titles[step] ?? 'Запись в студию'}</Heading>
                 {stepNumber ? (
@@ -147,6 +143,19 @@ export function BookingFlowPage() {
             </HStack>
             <DrawerClose className="rounded-md px-2 py-1 text-sm text-secondary hover:text-primary">Закрыть</DrawerClose>
           </HStack>
+          {stepNumber ? (
+            <HStack gap={1} aria-hidden>
+              {[1, 2, 3, 4].map((i) => (
+                <span
+                  key={i}
+                  className={cn(
+                    'h-1 flex-1 rounded-full transition-colors',
+                    i <= stepNumber ? 'bg-tenant-accent' : 'bg-border',
+                  )}
+                />
+              ))}
+            </HStack>
+          ) : null}
           <DrawerTitle className="sr-only">Оформление записи</DrawerTitle>
           <DrawerDescription className="sr-only">Выберите услугу, время и оставьте контакты</DrawerDescription>
         </DrawerHeader>
@@ -159,7 +168,7 @@ export function BookingFlowPage() {
               </span>
               <Heading level={3}>Свежий вид для вашего авто</Heading>
               <Text type="supporting" justify="center">
-                Выберем услугу и удобное время — остальное возьмём на себя
+                Выберите услугу и удобное время — остальное возьмём на себя
               </Text>
             </VStack>
             <Button label="Выбрать время" variant="primary" size="lg" width="100%" icon={<CaretRight size={18} />} onClick={() => setStep('service')} />
@@ -179,13 +188,13 @@ export function BookingFlowPage() {
                         {s.name}
                       </Text>
                       {s.description ? <Text type="supporting">{s.description}</Text> : null}
-                      <Text type="supporting">{s.durationMinutes} мин</Text>
+                      <Text type="supporting">{formatDuration(s.durationMinutes)}</Text>
                     </VStack>
                     <VStack gap={2} hAlign="end" className="shrink-0">
                       <Text type="body" weight="semibold">
                         {formatMoney(s.priceMinor, s.currency, tenant.locale)}
                       </Text>
-                      <Button label="Выбрать" variant="secondary" size="sm" onClick={() => chooseService(s.id)} />
+                      <Button label="Выбрать" variant="secondary" size="sm" icon={<CaretRight size={14} />} onClick={() => chooseService(s.id)} />
                     </VStack>
                   </HStack>
                 </div>
@@ -204,7 +213,6 @@ export function BookingFlowPage() {
                   </Text>
                   <Text type="supporting">{formatMoney(service.priceMinor, service.currency, tenant.locale)}</Text>
                 </VStack>
-                <Button label="Сменить" variant="ghost" size="sm" onClick={() => setStep('service')} />
               </HStack>
             </div>
 
@@ -243,7 +251,7 @@ export function BookingFlowPage() {
               <VStack gap={0}>
                 <Text type="supporting">Другая дата</Text>
                 <Text type="body" weight="semibold" hasTabularNumbers>
-                  {selectedDate ? formatZoned(new Date(`${selectedDate}T12:00:00Z`), 'd MMM yyyy', tenant.timezone) : ''}
+                  {selectedDate ? formatZoned(new Date(`${selectedDate}T12:00:00Z`), 'd MMM yyyyг.', tenant.timezone) : ''}
                 </Text>
               </VStack>
               <input
@@ -339,13 +347,13 @@ export function BookingFlowPage() {
                 <HStack gap={2} vAlign="center" hAlign="between">
                   <Text type="supporting">Заезд</Text>
                   <Text type="body" weight="medium">
-                    {formatZoned(new Date(startAt), 'd MMM, HH:mm', tenant.timezone)}
+                    {formatZoned(new Date(startAt), 'd MMMM в HH:mm', tenant.timezone)}
                   </Text>
                 </HStack>
                 <HStack gap={2} vAlign="center" hAlign="between">
                   <Text type="supporting">Выдача ориентировочно</Text>
                   <Text type="body" weight="medium">
-                    {formatZoned(endAt, 'd MMM, HH:mm', tenant.timezone)}
+                    {formatZoned(endAt, 'd MMMM в HH:mm', tenant.timezone)}
                   </Text>
                 </HStack>
                 <HStack gap={2} vAlign="center" hAlign="between">
@@ -372,8 +380,26 @@ export function BookingFlowPage() {
               </VStack>
             </div>
             <Text type="supporting">
-              Отмена — не позже чем за {tenant.cancelWindowMinutes} мин до заезда. Время студии: {tenant.timezone}.
+              Отмена онлайн — не позднее чем за {tenant.cancelWindowMinutes} мин до заезда. Время студии: {tenant.timezone}.
             </Text>
+            <button
+              type="button"
+              onClick={() => setConsent((v) => !v)}
+              className="flex items-start gap-2 text-left"
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border',
+                  consent ? 'border-tenant-accent bg-tenant-accent text-white' : 'border-border bg-surface',
+                )}
+              >
+                {consent ? '✓' : ''}
+              </span>
+              <Text type="supporting">
+                Передать эти данные студии для оформления записи
+              </Text>
+            </button>
             {createBooking.error ? (
               <Text type="supporting" role="alert">
                 {createBooking.error instanceof ApiFailure ? createBooking.error.message : 'Не удалось создать запись.'}
@@ -384,6 +410,7 @@ export function BookingFlowPage() {
               variant="primary"
               width="100%"
               size="lg"
+              isDisabled={!consent}
               isLoading={createBooking.isPending}
               onClick={() => void confirm()}
             />
@@ -420,15 +447,25 @@ export function BookingFlowPage() {
               </VStack>
             </div>
 
-            <HStack gap={3} vAlign="center" className="rounded-2xl border border-border bg-surface p-3">
-              <StarFour size={22} className="text-tenant-accent" aria-hidden />
-              <VStack gap={0}>
-                <Text type="body" weight="semibold">
-                  Добавить на экран
+            <div className="rounded-2xl border border-border bg-surface p-4">
+              <VStack gap={2}>
+                <HStack gap={3} vAlign="center">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-tenant-accent text-white">
+                    <StarFour size={22} weight="fill" aria-hidden />
+                  </span>
+                  <VStack gap={0}>
+                    <Text type="body" weight="semibold">
+                      Студия всегда под рукой
+                    </Text>
+                    <Text type="supporting">Записывайтесь за несколько касаний, без поиска ссылки и звонков</Text>
+                  </VStack>
+                </HStack>
+                <Button label="Добавить на экран" variant="primary" width="100%" href={tenantPath(slug, 'install')} />
+                <Text type="supporting" justify="center">
+                  Бесплатно. Установка через браузер.
                 </Text>
-                <Text type="supporting">Студия всегда под рукой — иконка и быстрый доступ</Text>
               </VStack>
-            </HStack>
+            </div>
 
             <VStack gap={2}>
               <Button label="Открыть мою запись" variant="primary" width="100%" onClick={() => void navigate(tenantPath(slug, `booking/${token ?? confirmed.id}`))} />

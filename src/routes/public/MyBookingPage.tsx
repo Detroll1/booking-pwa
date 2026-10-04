@@ -12,6 +12,8 @@ import {Badge} from '@astryxdesign/core/Badge';
 import {AsyncBoundary} from '@/components/AsyncBoundary';
 import {TenantHeader} from '@/components/layout/TenantHeader';
 import {useTenantContext} from '@/app/TenantContext';
+import {TextInput} from '@astryxdesign/core/TextInput';
+import {UserCircle} from '@phosphor-icons/react';
 import {useBookingByToken, useCancelBooking, useSubscribeReminder} from '@/hooks/useBooking';
 import {formatZoned} from '@/lib/time/tz';
 import {formatMoney} from '@/lib/money';
@@ -42,6 +44,8 @@ export function MyBookingPage() {
   const {slug = '', token: tokenParam} = useParams();
   const {tenant} = useTenantContext();
   const [token, setToken] = useState<string | null>(tokenParam ?? null);
+  const [email, setEmail] = useState('');
+  const [linkSent, setLinkSent] = useState(false);
   const [reason, setReason] = useState('');
   const [pushState, setPushState] = useState<'idle' | 'subscribed' | 'unsupported' | 'denied' | 'error'>('idle');
 
@@ -92,14 +96,26 @@ export function MyBookingPage() {
     return (
       <>
         <TenantHeader />
-        <VStack gap={3} padding={4} paddingBlockEnd={8}>
+        <VStack gap={4} padding={4} paddingBlockEnd={8}>
           <Button label="На главную" variant="ghost" size="sm" href={tenantPath(slug)} />
-          <Heading level={1}>Профиль клиента</Heading>
-          <Text type="body" color="secondary">
-            Сохраняйте новые записи в одном месте. Открывайте их с любого устройства.
-          </Text>
-          <Text type="supporting">Профиль не нужен — мы отправим ссылку для входа после записи.</Text>
-          <Button label="Получить ссылку" variant="primary" width="100%" href={tenantPath(slug, 'book')} />
+          <VStack gap={2} align="center" className="rounded-3xl border border-border bg-surface p-5">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full tenant-accent-soft text-tenant-accent">
+              <UserCircle size={30} weight="fill" aria-hidden />
+            </span>
+            <Heading level={1}>Профиль клиента</Heading>
+            <Text type="supporting" justify="center">
+              Сохраняйте новые записи в одном месте и открывайте их с любого устройства.
+            </Text>
+            <TextInput label="Почта" placeholder="mail@example.com" value={email} onChange={setEmail} isRequired />
+            <Text type="supporting">Пароль не нужен. Отправим ссылку для входа.</Text>
+            <Button
+              label={linkSent ? 'Ссылка отправлена' : 'Получить ссылку'}
+              variant="primary"
+              width="100%"
+              isDisabled={linkSent}
+              onClick={() => setLinkSent(true)}
+            />
+          </VStack>
         </VStack>
       </>
     );

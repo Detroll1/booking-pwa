@@ -94,6 +94,12 @@
   }
 }
 
+body {
+  background-color: var(--color-background-body);
+  background-image: radial-gradient(color-mix(in oklab, var(--color-border) 45%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

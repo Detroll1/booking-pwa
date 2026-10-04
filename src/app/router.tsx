@@ -6,6 +6,7 @@ import {TenantServicesPage} from '@/routes/public/TenantServicesPage';
 import {BookingFlowPage} from '@/routes/public/BookingFlowPage';
 import {MyBookingPage} from '@/routes/public/MyBookingPage';
 import {AssistantPage} from '@/routes/public/AssistantPage';
+import {InstallPage} from '@/routes/public/InstallPage';
 import {OwnerLayout} from '@/routes/owner/OwnerLayout';
 import {OwnerLoginPage} from '@/routes/owner/OwnerLoginPage';
 import {OwnerSchedulePage} from '@/routes/owner/OwnerSchedulePage';
@@ -28,6 +29,7 @@ export const router = (import.meta.env.VITE_HASH_ROUTER === 'true' ? createHashR
       {index: true, element: <TenantHomePage />},
       {path: 'services', element: <TenantServicesPage />},
       {path: 'ai', element: <AssistantPage />},
+      {path: 'install', element: <InstallPage />},
       {path: 'book', element: <BookingFlowPage />},
       {path: 'booking', element: <MyBookingPage />},
       {path: 'booking/:token', element: <MyBookingPage />},
