@@ -5,7 +5,6 @@ import {StackItem} from '@astryxdesign/core/Stack';
 import {Text} from '@astryxdesign/core/Text';
 import {useTenantContext} from '@/app/TenantContext';
 import {ownerPath, tenantPath} from '@/lib/tenant/resolve';
-import {demoMode} from '@/lib/api/client';
 
 /**
  * Compact studio header used on every client screen: logo + short name on the
@@ -31,13 +30,6 @@ export function TenantHeader() {
           </Text>
         </Link>
         <StackItem size="fill" />
-        {demoMode() ? (
-          <span className="rounded-full border border-border px-2 py-0.5">
-            <Text type="supporting" color="inherit">
-              Демо-режим
-            </Text>
-          </span>
-        ) : null}
         <Link to={ownerPath(slug, 'login')} aria-label="Кабинет владельца" className="text-secondary hover:text-primary">
           <UserCircle size={26} weight="duotone" />
         </Link>
