@@ -291,6 +291,22 @@ begin
 end;
 $$;
 
+create or replace function public.rpc_owner_set_cards(p_tenant_id uuid, p_cards jsonb)
+returns void
+language plpgsql
+as $$
+begin
+  if jsonb_typeof(p_cards) is distinct from 'array' then
+    raise exception 'cards_must_be_array' using errcode = 'P0025';
+  end if;
+  delete from public.info_cards where tenant_id = p_tenant_id;
+  insert into public.info_cards (tenant_id, title, body, icon, sort)
+  select p_tenant_id, c ->> 'title', c ->> 'body', c ->> 'icon', row_number() over ()::int
+  from jsonb_array_elements(p_cards) c
+  where nullif(c ->> 'title', '') is not null;
+end;
+$$;
+
 create or replace function public.rpc_owner_jobs(p_tenant_id uuid)
 returns jsonb
 language sql

@@ -20,6 +20,28 @@ for (const slug of readdirSync(tenantsDir)) {
   mkdirSync(dir, {recursive: true});
   const html = index.replace('<title>', `<title>${slug}</title><meta name="x-tenant" content="${slug}" />`);
   writeFileSync(join(dir, 'index.html'), html, 'utf8');
+  writeFileSync(
+    join(dir, 'manifest.webmanifest'),
+    JSON.stringify(
+      {
+        id: `/s/${slug}/`,
+        name: slug,
+        short_name: slug.slice(0, 14),
+        start_url: `/s/${slug}/`,
+        scope: `/s/${slug}/`,
+        display: 'standalone',
+        background_color: '#0a0a0b',
+        theme_color: '#4690ff',
+        icons: [
+          {src: '/hero.jpg', sizes: '512x512', type: 'image/jpeg', purpose: 'any'},
+          {src: '/hero.jpg', sizes: '512x512', type: 'image/jpeg', purpose: 'maskable'},
+        ],
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  );
   if (existsSync(join(dist, 'sw.js'))) cpSync(join(dist, 'sw.js'), join(dir, 'sw.js'));
   for (const route of ROUTES) {
     const routeDir = join(dir, route);

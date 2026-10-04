@@ -1,6 +1,16 @@
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {CalendarPlus, Clock, MapPin, Phone, BellRinging, Warning} from '@phosphor-icons/react';
+import {CalendarPlus, Clock, MapPin, Phone, BellRinging, Warning, CalendarDots, ShareNetwork} from '@phosphor-icons/react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from '@/components/ui/drawer';
+import {useAvailability} from '@/hooks/useAvailability';
+import {cn} from '@/lib/utils';
+import {getIdempotencyKey, clearIdempotencyKey} from '@/lib/idem';
 import {VStack} from '@astryxdesign/core/VStack';
 import {HStack} from '@astryxdesign/core/HStack';
 import {Text} from '@astryxdesign/core/Text';
@@ -14,7 +24,7 @@ import {TenantHeader} from '@/components/layout/TenantHeader';
 import {useTenantContext} from '@/app/TenantContext';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {UserCircle} from '@phosphor-icons/react';
-import {useBookingByToken, useCancelBooking, useSubscribeReminder} from '@/hooks/useBooking';
+import {useBookingByToken, useCancelBooking, useRescheduleBooking, useSubscribeReminder} from '@/hooks/useBooking';
 import {formatZoned} from '@/lib/time/tz';
 import {formatMoney} from '@/lib/money';
 import {ApiFailure} from '@/lib/api/client';
@@ -42,11 +52,14 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
 
 export function MyBookingPage() {
   const {slug = '', token: tokenParam} = useParams();
-  const {tenant} = useTenantContext();
+  const {tenant, services} = useTenantContext();
   const [token, setToken] = useState<string | null>(tokenParam ?? null);
   const [email, setEmail] = useState('');
   const [linkSent, setLinkSent] = useState(false);
   const [reason, setReason] = useState('');
+  const [moveOpen, setMoveOpen] = useState(false);
+  const [moveDate, setMoveDate] = useState('');
+  const [newStart, setNewStart] = useState<string | null>(null);
   const [pushState, setPushState] = useState<'idle' | 'subscribed' | 'unsupported' | 'denied' | 'error'>('idle');
 
   useEffect(() => {
@@ -62,7 +75,21 @@ export function MyBookingPage() {
   const query = useBookingByToken(slug, token);
   const cancel = useCancelBooking();
   const subscribe = useSubscribeReminder();
+  const reschedule = useRescheduleBooking();
   const booking = query.data?.booking ?? null;
+
+  const serviceId = services.find((s) => s.name === booking?.serviceName)?.id ?? null;
+  const moveAvailability = useAvailability(slug, serviceId, moveDate || new Date().toISOString().slice(0, 10), 10);
+  const moveDay = moveAvailability.data?.days.find((d) => d.date === moveDate) ?? null;
+
+  async function shareLink() {
+    const url = `${window.location.origin}/s/${slug}/booking/${token}`;
+    try {
+      await navigator.share({title: 'Моя запись', text: booking?.serviceName ?? 'Запись в студию', url});
+    } catch {
+      void navigator.clipboard?.writeText(url).catch(() => undefined);
+    }
+  }
 
   async function enableReminder() {
     const vapid = import.meta.env.VITE_VAPID_PUBLIC_KEY ?? '';
@@ -144,6 +171,12 @@ export function MyBookingPage() {
                 Добавьте визит в календарь — это работает всегда. Push-напоминание доступно после установки
                 приложения (на iPhone — только из установленной на главный экран версии).
               </Text>
+              <HStack gap={2}>
+                <Button label="Поделиться" variant="secondary" size="sm" icon={<ShareNetwork size={16} />} onClick={() => void shareLink()} />
+                {booking.canCancel ? (
+                  <Button label="Перенести" variant="secondary" size="sm" icon={<CalendarDots size={16} />} onClick={() => setMoveOpen(true)} />
+                ) : null}
+              </HStack>
               <Button label="Добавить в календарь" variant="secondary" width="100%" href={booking.icsUrl} />
               {pushState === 'subscribed' ? (
                 <Text type="supporting">Push-напоминание включено.</Text>
@@ -203,6 +236,76 @@ export function MyBookingPage() {
         </VStack>
       ) : null}
       </VStack>
+
+      <Drawer open={moveOpen} onOpenChange={setMoveOpen} swipeDirection="down">
+        <DrawerContent>
+          <DrawerHeader>
+            <HStack hAlign="between" vAlign="center">
+              <DrawerTitle>Перенести запись</DrawerTitle>
+              <DrawerClose className="rounded-md px-2 py-1 text-sm text-secondary hover:text-primary">Закрыть</DrawerClose>
+            </HStack>
+          </DrawerHeader>
+          <VStack gap={3}>
+            <input
+              type="date"
+              aria-label="Другая дата"
+              value={moveDate}
+              onChange={(e) => {
+                setMoveDate(e.target.value);
+                setNewStart(null);
+              }}
+              className="rounded-xl border border-border bg-surface px-3 py-2 text-primary"
+            />
+            <AsyncBoundary
+              isLoading={moveAvailability.isLoading}
+              error={moveAvailability.error}
+              isEmpty={(moveDay?.slots.length ?? 0) === 0}
+              emptyTitle="Нет свободного времени"
+            >
+              <HStack gap={2} wrap="wrap">
+                {(moveDay?.slots ?? []).map((slot) => (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => setNewStart(slot)}
+                    className={cn(
+                      'rounded-lg border px-3 py-2',
+                      newStart === slot ? 'border-tenant-accent tenant-accent-soft' : 'border-border bg-surface',
+                    )}
+                  >
+                    <Text type="body" weight="medium" hasTabularNumbers>
+                      {formatZoned(new Date(slot), 'HH:mm', moveAvailability.data?.timezone ?? 'UTC')}
+                    </Text>
+                  </button>
+                ))}
+              </HStack>
+            </AsyncBoundary>
+            {reschedule.error ? <Text type="supporting">Не удалось перенести. Это время занято?</Text> : null}
+            <Button
+              label={reschedule.isPending ? 'Переносим…' : 'Перенести'}
+              variant="primary"
+              width="100%"
+              isDisabled={!newStart || !token}
+              isLoading={reschedule.isPending}
+              onClick={() => {
+                if (!newStart || !token) return;
+                const scope = `client-move:${slug}:${booking?.id}:${newStart}`;
+                reschedule.mutate(
+                  {slug, token, startAt: newStart, idempotencyKey: getIdempotencyKey(scope)},
+                  {
+                    onSuccess: () => {
+                      clearIdempotencyKey(scope);
+                      setMoveOpen(false);
+                      setNewStart(null);
+                      void query.refetch();
+                    },
+                  },
+                );
+              }}
+            />
+          </VStack>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }
