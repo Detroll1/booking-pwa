@@ -13,7 +13,7 @@ export const MOCK_BOOKING = {
   id: 'b0000000-0000-0000-0000-000000000001',
   tenantSlug: 'graphite-detailing',
   status: 'confirmed',
-  serviceName: 'Комплексная мойка',
+  serviceName: 'Экспресс-мойка',
   customerName: 'Тест Клиент',
   customerPhone: '+7 900 111-22-33',
   car: 'BMW X5',

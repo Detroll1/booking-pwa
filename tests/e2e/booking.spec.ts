@@ -44,7 +44,7 @@ test('client books a service and sees the appointment', async ({page}) => {
   // Open the booking
   await page.getByRole('button', {name: 'Открыть мою запись'}).click();
   await expect(page.getByRole('heading', {name: 'Моя запись'})).toBeVisible();
-  await expect(page.getByText('Комплексная мойка')).toBeVisible();
+  await expect(page.getByText('Экспресс-мойка')).toBeVisible();
 });
 
 test('owner route requires login (no public signup)', async ({page}) => {
